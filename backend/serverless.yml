@@ -112,7 +112,7 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
 
   DeleteJob:
-    handler: src/lambda/http/deleteTodo.handler
+    handler: src/lambda/http/deleteJob.handler
     events:
       - http:
           method: delete
@@ -141,6 +141,18 @@ functions:
           #- s3:PutLifecycleConfiguration
         Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}
 
+  NewImgNotifications:
+    handler: src/lambda/s3/convertImage.handler
+    events:
+      - sns:
+          arn:
+            Fn::join:
+              - :
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:provider.environment.S3_IMGS}-SNSTopic
+          topicName: ${self:provider.environment.S3_IMGS}-SNSTopic
 resources:
   Resources:
     # INFRASTRUCTURE
