@@ -152,7 +152,14 @@ functions:
               - Ref: AWS::Region
               - Ref: AWS::AccountId
               - ${self:provider.environment.S3_IMGS}-SNSTopic
-        topicName: ${self:provider.environment.S3_IMGS}-SNSTopic
+        topicName: 
+          arn:
+          Fn::join:
+            - ':'
+            - - arn:aws:sns
+              - Ref: AWS::Region
+              - Ref: AWS::AccountId
+              - ${self:provider.environment.S3_IMGS}-SNSTopic
 resources:
   Resources:
     # INFRASTRUCTURE
