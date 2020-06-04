@@ -1,0 +1,300 @@
+service:
+  name: sls-3dinpainting-app
+
+plugins:
+  - serverless-webpack
+  - serverless-aws-documentation
+  - serverless-iam-roles-per-function
+  - serverless-reqvalidator-plugin
+  - serverless-plugin-tracing
+
+package:
+  individually: true
+
+provider:
+  name: aws
+  # runtime: nodejs8.10
+  runtime: nodejs12.x
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  
+  tracing:
+    lambda: true
+    apiGateway: true
+    iamRoleStatements:            # Permissions here or under every function to trace
+      - Effect: 'Allow'           # xray tracing permissions
+        Action:
+          - 'xray:PutTraceSegments'             # Trace Segments
+          - 'xray:PutTelemetryRecords'          # Tracing and telemetry
+        Resource:
+          - '*'
+  environment:
+    LOG_LEVEL: debug
+
+    JOBS_TABLE: tblJOBS-${self:provider.stage}
+    IDX_JOBS_NAME: idxJobsName-${self:provider.stage}
+    IDX_JOBS_JOBID: idxJobsId-${self:provider.stage}
+    IDX_JOBS_USERID: idxJobsUserId-${self:provider.stage}
+    S3_IMGS: ${self:service.name}-IMGS-${self:provider.stage}
+    S3_VIDS: ${self:service.name}-VIDS-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
+
+custom:
+  documentation:
+  api:
+    info:
+      version: "v0.0.1"
+      title: "CDND-05 CAPSTONE IMAGE APP"
+      description: "Capstone Image App for CDND05. (c) Christian Kulik"
+      contact:
+        name: "Christian Kulik"
+        url: "https://github.com/chk-code"
+        email: "63784760+chk-code@users.noreply.github.com"
+      license:
+          name: "MIT License"
+          url: "https://raw.githubusercontent.com/chk-code/cdnd-05-3dinpainting/LICENSE"
+  models:
+    - name: CreateJobRequest
+      contentType: application/json
+      schema: ${file(models/create-job-request.json)}
+
+functions:
+
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+
+  # DONE: Configure this function
+  GetJobs:
+    handler: src/lambda/http/getJobs.handler
+    iamRoleStatementsName: GetJobs-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}/index/${self:provider.environment.IDX_JOBS_USERID}
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}/*
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}/*
+    events:
+      - http:
+          method: get
+          path: jobs
+          authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+
+  # DONE: Configure this function
+  CreateJobs:
+    handler: src/lambda/http/createJob.handler
+    events:
+      - http:
+          method: post
+          path: jobs
+          authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new Job
+            description: Create a new Job
+    iamRoleStatementsName: CreateJob-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+
+resources:
+  Resources:
+    # INFRASTRUCTURE
+    GatewayResponseDefault4xx:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId: !Ref ApiGatewayRestApi
+      
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    # TABLES
+    JobsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: jobId
+            AttributeType: S
+          - AttributeName: jobName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: jobId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.JOBS_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.IDX_JOBS_NAME}
+            KeySchema:
+            - AttributeName: jobName
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ${self:provider.environment.IDX_JOBS_JOBID}
+            KeySchema:
+            - AttributeName: jobId
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ${self:provider.environment.IDX_JOBS_USERID}
+            KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    # S3 - Images Bucket
+    ImgBucketTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:provider.environment.S3_IMGS}-SNSTopic
+        DisplayName: ${self:provider.environment.S3_IMGS}-SNSTopic
+
+    ImgBucketTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: "*"
+              Action: sns:Publish
+              Resource:
+                !Ref ImgBucketTopic
+              Condition:
+                ArnLike:
+                  AWS:SourceArn: arn:aws:s3:::${self:provider.environment.S3_IMGS}
+        Topics:
+          - !Ref ImgBucketTopic
+
+    ImgBucket:
+      Type: AWS::S3::Bucket
+      DependsOn: ImgBucketTopicPolicy
+      Properties:
+        BucketName: ${self:provider.environment.S3_IMGS}
+        NotificationConfiguration:
+          TopicConfigurations:
+            - Event: s3:ObjectCreated:Put
+              Topic: !Ref ImgBucketTopic
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    ImgBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: ${self:provider.environment.S3_IMGS}-policy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.S3_IMGS}/*'
+        Bucket: !Ref ImgBucket
+
+    # S3 - Videos Bucket
+    VidsBucketTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:provider.environment.S3_VIDS}-SNSTopic
+        DisplayName: ${self:provider.environment.S3_VIDS}-SNSTopic
+
+    VidsBucketTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: "*"
+              Action: sns:Publish
+              Resource:
+                !Ref VidsBucketTopic
+              Condition:
+                ArnLike:
+                  AWS:SourceArn: arn:aws:s3:::${self:provider.environment.S3_VIDS}
+        Topics:
+          - !Ref VidsBucketTopic
+
+    VidBucket:
+      Type: AWS::S3::Bucket
+      DependsOn: VidsBucketTopicPolicy
+      Properties:
+        BucketName: ${self:provider.environment.S3_VIDS}
+        NotificationConfiguration:
+          TopicConfigurations:
+            - Event: s3:ObjectCreated:Put
+              Topic: !Ref VidsBucketTopic
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    VidBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: ${self:provider.environment.S3_VIDS}-policy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.S3_VIDS}/*'
+        Bucket: !Ref VidBucket

@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "job",
+    "type": "object",
+    "properties": {
+      "userId": {
+        "type": "string"
+      },
+      "jobId": {
+        "type": "string"
+      },
+      "createdAt": {
+        "type":"string"
+      },
+      "jobName": {
+        "type":"string"
+      },
+      "jobStatus":{
+        "type":"string"
+      },
+      "imgUrl": {
+        "type":"string"
+      },
+      "vidUrl_01": {
+        "type":"string"
+      },
+      "vidUrl_02": {
+        "type":"string"
+      },
+      "vidUrl_03": {
+        "type":"string"
+      },
+      "vidUrl_04": {
+        "type":"string"
+      }
+    },
+    "required": [
+      "userId",
+      "jobId",
+      "createdAt",
+      "jobName",
+      "jobStatus"
+    ],
+    "additionalProperties": false
+  }
