@@ -147,7 +147,7 @@ functions:
       - sns:
           arn:
             Fn::join:
-              - :
+              - ':'
               - - arn:aws:sns
                 - Ref: AWS::Region
                 - Ref: AWS::AccountId
