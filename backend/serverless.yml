@@ -36,8 +36,8 @@ provider:
     IDX_JOBS_NAME: idxJobsName-${self:provider.stage}
     IDX_JOBS_JOBID: idxJobsId-${self:provider.stage}
     IDX_JOBS_USERID: idxJobsUserId-${self:provider.stage}
-    S3_IMGS: ${self:service.name}-IMGS-${self:provider.stage}
-    S3_VIDS: ${self:service.name}-VIDS-${self:provider.stage}
+    S3_IMGS: ${self:service.name}-imgs-${self:provider.stage}
+    S3_VIDS: ${self:service.name}-vids-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
 custom:
