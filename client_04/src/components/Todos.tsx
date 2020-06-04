@@ -16,7 +16,7 @@ import {
 
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
-import { Todo } from '../types/Todo'
+import { Jobs } from '../types/Job'
 
 interface TodosProps {
   auth: Auth
@@ -24,7 +24,7 @@ interface TodosProps {
 }
 
 interface TodosState {
-  todos: Todo[]
+  todos: Jobs[]
   newTodoName: string
   loadingTodos: boolean
 }
@@ -40,8 +40,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     this.setState({ newTodoName: event.target.value })
   }
 
-  onEditButtonClick = (todoId: string) => {
-    this.props.history.push(`/todos/${todoId}/edit`)
+  onEditButtonClick = (jobId: string) => {
+    this.props.history.push(`/todos/${jobId}/edit`)
   }
 
   onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
@@ -60,11 +60,11 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
-  onTodoDelete = async (todoId: string) => {
+  onTodoDelete = async (jobId: string) => {
     try {
-      await deleteTodo(this.props.auth.getIdToken(), todoId)
+      await deleteTodo(this.props.auth.getIdToken(), jobId)
       this.setState({
-        todos: this.state.todos.filter(todo => todo.todoId !== todoId)
+        todos: this.state.todos.filter(todo => todo.jobId !== jobId)
       })
     } catch {
       alert('Todo deletion failed')
@@ -74,7 +74,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   onTodoCheck = async (pos: number) => {
     try {
       const todo = this.state.todos[pos]
-      await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
+      await patchTodo(this.props.auth.getIdToken(), todo.jobId, {
         name: todo.name,
         dueDate: todo.dueDate,
         done: !todo.done
@@ -162,7 +162,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       <Grid padded>        
         { this.state.todos.map((todo, pos) => {
           return (
-            <Grid.Row key={todo.todoId}>
+            <Grid.Row key={todo.jobId}>
               <Grid.Column width={1} verticalAlign="middle">
                 <Checkbox
                   onChange={() => this.onTodoCheck(pos)}
@@ -179,7 +179,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 <Button
                   icon
                   color="blue"
-                  onClick={() => this.onEditButtonClick(todo.todoId)}
+                  onClick={() => this.onEditButtonClick(todo.jobId)}
                 >
                   <Icon name="pencil" />
                 </Button>
@@ -188,7 +188,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 <Button
                   icon
                   color="red"
-                  onClick={() => this.onTodoDelete(todo.todoId)}
+                  onClick={() => this.onTodoDelete(todo.jobId)}
                 >
                   <Icon name="delete" />
                 </Button>

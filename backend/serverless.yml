@@ -144,15 +144,15 @@ functions:
   NewImgNotifications:
     handler: src/lambda/s3/convertImage.handler
     events:
-      - sns:
-          arn:
-            Fn::join:
-              - ':'
-              - - arn:aws:sns
-                - Ref: AWS::Region
-                - Ref: AWS::AccountId
-                - ${self:provider.environment.S3_IMGS}-SNSTopic
-          topicName: ${self:provider.environment.S3_IMGS}-SNSTopic
+    - sns:
+        arn:
+          Fn::join:
+            - ':'
+            - - arn:aws:sns
+              - Ref: AWS::Region
+              - Ref: AWS::AccountId
+              - ${self:provider.environment.S3_IMGS}-SNSTopic
+        topicName: ${self:provider.environment.S3_IMGS}-SNSTopic
 resources:
   Resources:
     # INFRASTRUCTURE
