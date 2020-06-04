@@ -60,9 +60,9 @@ export async function BL_createJob(createJobRequest: CreateJobRequest, userId: s
  * @returns boolean, true= job deleted, false=job NOT deleted
  */
 export async function BL_deleteJob(jobId: string, userId: string): Promise<boolean> {
-    logger.info("### Starting deleteTodoItem ###")
+    logger.info("### "+strLayer+" ### Starting deleteTodoItem ###")
 
-    logger.info("### End of deleteTodoItem ###")
+    logger.info("### "+strLayer+" ### End of deleteTodoItem ###")
     return await jobsDataAccess.deleteTodo(jobId, userId)
 }
 // GENERATE Functions

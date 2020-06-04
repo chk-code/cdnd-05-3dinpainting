@@ -184,8 +184,8 @@ export class Jobs_Data_Access{
         TableName: this.jobsTable,
         Key:
         {
-            todoId: jobId,
-            userId: userId
+            userId: userId,
+            jobId: jobId
         }
         }).promise()
         if (delRes.$response.error)
