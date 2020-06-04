@@ -152,14 +152,8 @@ functions:
               - Ref: AWS::Region
               - Ref: AWS::AccountId
               - ${self:provider.environment.S3_IMGS}-SNSTopic
-        topicName: 
-          arn:
-          Fn::join:
-            - ':'
-            - - arn:aws:sns
-              - Ref: AWS::Region
-              - Ref: AWS::AccountId
-              - ${self:provider.environment.S3_IMGS}-SNSTopic
+        topicName: arn:aws:sns:eu-central-1:335400721406:sls-3dinpainting-app-imgs-dev-SNSTopic
+
 resources:
   Resources:
     # INFRASTRUCTURE
