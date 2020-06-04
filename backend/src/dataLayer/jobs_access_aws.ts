@@ -171,26 +171,33 @@ export class Jobs_Data_Access{
         return resUpd.$response.data as TodoItem  
     } */
     // DELETE Functions
-    /* async deleteTodo(todoId: string, userId: string): Promise<boolean> {
-        logger.info("### Starting deleteTodo ###")
-        //if(await this.getImageS3(todoId))
-        //    await this.deleteImageS3(todoId)
+    /**
+     * Delete in DynamoDB an entry for the specified Job element
+     * @param jobId Id of an specific Job Element
+     * @param userId an specific ID of an User
+     * @returns the identical Job element
+    */
+    async deleteTodo(jobId: string, userId: string): Promise<boolean> {
+        logger.info("### "+strLayer+" ### Starting deleteTodo ###")
+        // TODO: Delete also S3 Images and Videos
         const delRes = await this.docClient.delete({
-        TableName: this.todoTable,
+        TableName: this.jobsTable,
         Key:
         {
-            todoId: todoId,
+            todoId: jobId,
             userId: userId
         }
         }).promise()
         if (delRes.$response.error)
         {
+            // If error occurs, return FALSE = job Item not deleted
             logger.error(delRes.$response.error)
             return false
         }
-        logger.info("### End of deleteTodo ###")
+        logger.info("### "+strLayer+" ### End of deleteTodo ###")
+        // Return true = Job Item deleted
         return true
-    } */
+    }
     // GENERATE Functions
     // Nothing yet
 }

@@ -2,14 +2,14 @@ import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
 import { createLogger } from '../../utils/logger'
-import { getUserId } from '../utils'
-import { generateUploadUrl } from '../../businessLogic/jobs_items'
+// import { getUserId } from '../utils'
+// import { generateUploadUrl } from '../../businessLogic/jobs_items'
 
 const logger = createLogger('generate-upload-url')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   logger.info('Processing new Image: ', event)
-  const todoId = event.pathParameters.todoId
+  /* const todoId = event.pathParameters.todoId
   const userId = getUserId(event)
   if (!todoId) {
     logger.error('Todo not provided')
@@ -25,7 +25,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     }
   }
   const response = await generateUploadUrl(todoId,userId,event)
-
+ */
   logger.info("Update complete. Presigned URL generated successfully ")
   // DONE: Return a presigned URL to upload a file for a TODO item with the provided id
   return {
@@ -34,7 +34,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify({
-      "uploadUrl": response.uploadUrl
+      "uploadUrl": "null" // response.uploadUrl
     })
   }
 }

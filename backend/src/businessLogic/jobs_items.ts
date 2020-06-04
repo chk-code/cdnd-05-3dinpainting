@@ -53,12 +53,18 @@ export async function BL_createJob(createJobRequest: CreateJobRequest, userId: s
     return await todoDataAccess.updateTodo(todoId,userId,element) 
 } */
 // DELETE Functions
-/* export async function deleteTodo(todoId: string, userId: string): Promise<boolean> {
+/**
+ * Delete a job of an user
+ * @param jobId Job Id of Job that will be deleted
+ * @param userId specific user id of an user
+ * @returns boolean, true= job deleted, false=job NOT deleted
+ */
+export async function BL_deleteJob(jobId: string, userId: string): Promise<boolean> {
     logger.info("### Starting deleteTodoItem ###")
 
     logger.info("### End of deleteTodoItem ###")
-    return await todoDataAccess.deleteTodo(todoId, userId)
-} */
+    return await jobsDataAccess.deleteTodo(jobId, userId)
+}
 // GENERATE Functions
 /* export async function generateUploadUrl(todoId: string, userId: string, event: any): Promise<any> {
     logger.info("### Starting generateUploadUrl ###")

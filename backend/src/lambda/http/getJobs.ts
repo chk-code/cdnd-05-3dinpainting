@@ -2,17 +2,17 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } f
 import 'source-map-support/register'
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
-import { getTodoItems } from '../../businessLogic/jobs_items'
+import { BL_getJobItems } from '../../businessLogic/jobs_items'
 
 const logger = createLogger('get-todos')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  // DONE: Get all TODO items for a current user
+  // DONE: Get all Job items for a current user
   logger.info('Processing event: ', event)
   const userId = getUserId(event)
   logger.info("Get ToDos for user : " + userId + " !", event)
-  const todos = await getTodoItems(userId)
-  logger.info('Return Todos: ', todos)
+  const jobItems = await BL_getJobItems(userId)
+  logger.info('Return Todos: ', jobItems)
 
   return {
     statusCode: 200,
@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      items: todos
+      items: jobItems
     })
   }
 }
