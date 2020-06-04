@@ -111,7 +111,7 @@ functions:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
 
-  DeleteTodo:
+  DeleteJob:
     handler: src/lambda/http/deleteTodo.handler
     events:
       - http:
