@@ -44,7 +44,7 @@ custom:
   documentation:
   api:
     info:
-      version: "v0.0.1"
+      version: "v0.0.2"
       title: "CDND-05 CAPSTONE IMAGE APP"
       description: "Capstone Image App for CDND05. (c) Christian Kulik"
       contact:
@@ -64,7 +64,6 @@ functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # DONE: Configure this function
   GetJobs:
     handler: src/lambda/http/getJobs.handler
     iamRoleStatementsName: GetJobs-${self:provider.stage}
@@ -93,7 +92,6 @@ functions:
           cors: true
           reqValidatorName: RequestBodyValidator
 
-  # DONE: Configure this function
   CreateJobs:
     handler: src/lambda/http/createJob.handler
     events:
@@ -112,6 +110,36 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+
+  DeleteTodo:
+    handler: src/lambda/http/deleteTodo.handler
+    events:
+      - http:
+          method: delete
+          path: jobs/{jobId}
+          authorizer: Auth
+          cors: true
+          documentation:
+            summary: Delete a Job
+            description: Delete a Job
+    iamRoleStatementsName: DeleteJob-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+      - Effect: Allow
+        Action:
+          - s3:s3:DeleteObject
+          #- s3:DeleteObjectVersion
+          #- s3:PutLifecycleConfiguration
+        Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}
+      - Effect: Allow
+        Action:
+          - s3:s3:DeleteObject
+          #- s3:DeleteObjectVersion
+          #- s3:PutLifecycleConfiguration
+        Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}
 
 resources:
   Resources:
