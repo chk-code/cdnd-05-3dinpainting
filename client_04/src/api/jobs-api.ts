@@ -1,10 +1,10 @@
 import { apiEndpoint } from '../config'
-import { Jobs } from '../types/Job';
+import { Job } from '../types/Job';
 import { CreateJobRequest } from '../types/CreateJobRequest';
 import Axios from 'axios'
 import { UpdateJobStatusRequest } from '../types/UpdateJobStatusRequest';
 
-export async function getJobs(idToken: string): Promise<Jobs[]> {
+export async function getJobs(idToken: string): Promise<Job[]> {
   console.log('Fetching Jobs')
 
   const response = await Axios.get(`${apiEndpoint}/jobs`, {
@@ -20,7 +20,7 @@ export async function getJobs(idToken: string): Promise<Jobs[]> {
 export async function createJob(
   idToken: string,
   newJob: CreateJobRequest
-): Promise<Jobs> {
+): Promise<Job> {
   const response = await Axios.post(`${apiEndpoint}/jobs`,  JSON.stringify(newJob), {
     headers: {
       'Content-Type': 'application/json',

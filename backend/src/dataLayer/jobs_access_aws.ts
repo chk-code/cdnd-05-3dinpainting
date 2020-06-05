@@ -126,31 +126,27 @@ export class Jobs_Data_Access{
           }).promise()
     } */
     // UPDATE Functions
-    /* async updateTodo(todo_Id: string, user_Id: string, updateTodo: any): Promise<TodoItem> {
-        logger.info("### Starting updateTodo ###")
+    async updateJobStatus(jobId: string, userId: string, updateJobStatus: any): Promise<JobItem> {
+        logger.info("### "+strLayer+" ### Starting updateJobStatus ###")
         const tblKey = {
-          userId: user_Id,
-          todoId: todo_Id          
+          userId: userId,
+          jobId: jobId          
         }
         const resUpd = await this.docClient.update({
-            TableName: this.todoTable,
+            TableName: this.jobsTable,
             Key: tblKey,
-            UpdateExpression: 'set #n = :n, #dD = :dD, #d = :d',
+            UpdateExpression: 'set #js = :jobStat',
             ExpressionAttributeNames: {
-                '#n' : 'name',
-                '#dD' : 'dueDate',
-                '#d' : 'done',
+                '#js' : 'jobStatus'
               },
             ExpressionAttributeValues:{
-              ':n' : updateTodo.name,
-              ':dD' : updateTodo.dueDate,
-              ':d' : updateTodo.done,
+              ':jobStat' : updateJobStatus.jobStatus
               },
             ReturnValues: "UPDATED_NEW"
           }).promise()  
-        logger.info("### End of updateTodo ###")
-        return resUpd.$response.data as TodoItem  
-    } */
+        logger.info("### "+strLayer+" ### End of updateJobStatus ###")
+        return resUpd.$response.data as JobItem  
+    }
     /* async updateTodoURL(todoId: string, userId: string): Promise<TodoItem> {
         logger.info("### Starting updateTodoURL ###")
         const imgURL = `https://${this.bucketName}.s3.amazonaws.com/${todoId}`
@@ -177,8 +173,8 @@ export class Jobs_Data_Access{
      * @param userId an specific ID of an User
      * @returns the identical Job element
     */
-    async deleteTodo(jobId: string, userId: string): Promise<boolean> {
-        logger.info("### "+strLayer+" ### Starting deleteTodo ###")
+    async deleteJob(jobId: string, userId: string): Promise<boolean> {
+        logger.info("### "+strLayer+" ### Starting deleteJob ###")
         // TODO: Delete also S3 Images and Videos
         const delRes = await this.docClient.delete({
         TableName: this.jobsTable,
@@ -194,7 +190,7 @@ export class Jobs_Data_Access{
             logger.error(delRes.$response.error)
             return false
         }
-        logger.info("### "+strLayer+" ### End of deleteTodo ###")
+        logger.info("### "+strLayer+" ### End of deleteJob ###")
         // Return true = Job Item deleted
         return true
     }

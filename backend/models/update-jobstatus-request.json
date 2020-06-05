@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "update-jobstatus",
+    "type": "object",
+    "properties": {
+      "jobId": {
+        "type": "string"
+      },
+      "jobStatus":{
+        "type":"string"
+      }
+    },
+    "required": [
+      "jobStatus"
+    ],
+    "additionalProperties": false
+  }

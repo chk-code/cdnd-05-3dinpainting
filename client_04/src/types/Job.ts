@@ -1,4 +1,4 @@
-export interface Jobs {
+export interface Job {
   userId: string
   jobId: string
   createdAt: string

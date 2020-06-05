@@ -3,18 +3,17 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
-// import { updateTodo } from '../../businessLogic/jobs_items'
-// import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
-const logger = createLogger('update-todo')
+import { UpdateJobStatusRequest } from '../../requests/UpdateJobStatusRequest'
+import { BL_updateJobStatus } from '../../businessLogic/jobs_items'
+const logger = createLogger('update-job')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const jobId = event.pathParameters.jobId
   const userId = getUserId(event)
-  /* const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
+  const updatedJobStatus: UpdateJobStatusRequest = JSON.parse(event.body)
   
-  // DONE: Update a TODO item with the provided id using values in the "updatedTodo" object
-  if (!todoId){
-    logger.info('Item Id not provided.')
+  if (!jobId){
+    logger.info('Job Id not provided.')
     return {
       statusCode: 404,
       headers: {
@@ -22,22 +21,21 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         'Access-Control-Allow-Credentials': true
       },
       body: JSON.stringify({
-        error: 'Item Id not provided.'
+        error: 'Job Id not provided.'
       })
     }
   }
-  logger.info('Patching Todo Item: ')
   // Patch
-  logger.info("Request from "+userId+" for updating Todo "+todoId)
-  const updItem = await updateTodo(todoId, userId, updatedTodo)
- */
-  logger.info("Update of Todo Item succeeded: "+userId, jobId)
+  logger.info("Request from "+userId+" for updating Job "+jobId)
+  const updItem = await BL_updateJobStatus(jobId, userId, updatedJobStatus)
+
+  logger.info("Update of Job Item succeeded: "+userId, updItem)
   return {
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true
     },
-    body: JSON.stringify({item: jobId})
+    body: JSON.stringify({item: updItem})
   }
 }

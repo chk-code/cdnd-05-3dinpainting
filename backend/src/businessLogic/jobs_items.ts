@@ -3,6 +3,7 @@ import { JobItem } from '../models/JobItem'
 import { JobStatus } from '../models/JobStatus'
 import { Jobs_Data_Access } from '../dataLayer/jobs_access_aws'
 import { CreateJobRequest } from '../requests/CreateJobRequest'
+import { UpdateJobStatusRequest } from '../requests/UpdateJobStatusRequest'
 import * as uuid from 'uuid'
 
 const jobsDataAccess = new Jobs_Data_Access()
@@ -42,16 +43,21 @@ export async function BL_createJob(createJobRequest: CreateJobRequest, userId: s
         })
 }
 // UPDATE Functions
-/* export async function updateTodo(todoId: string, userId: string, updateTodoRequest: UpdateTodoRequest): Promise<TodoItem> {
-    logger.info("### Starting updateTodo ###")
+/**
+ * Update the job status of an specific job of an specific user
+ * @param jobId Job Id of Job that will be deleted
+ * @param userId specific user id of an user
+ * @param updateJobStatusRequest 
+ * @returns JobItem, the updatem Job as a JobItem
+ */
+export async function BL_updateJobStatus(jobId: string, userId: string, updateJobStatusRequest: UpdateJobStatusRequest): Promise<JobItem> {
+    logger.info("### "+strLayer+" ### Starting BL_updateJobStatus ###")
     const element = {
-        name: updateTodoRequest.name,
-        dueDate: updateTodoRequest.dueDate,
-        done: updateTodoRequest.done
+        jobStatus: updateJobStatusRequest.jobStatus
     }
-    logger.info("### End of updateTodo ###")
-    return await todoDataAccess.updateTodo(todoId,userId,element) 
-} */
+    logger.info("### "+strLayer+" ### End of BL_updateJobStatus ###")
+    return await jobsDataAccess.updateJobStatus(jobId,userId,element) 
+}
 // DELETE Functions
 /**
  * Delete a job of an user
@@ -60,10 +66,10 @@ export async function BL_createJob(createJobRequest: CreateJobRequest, userId: s
  * @returns boolean, true= job deleted, false=job NOT deleted
  */
 export async function BL_deleteJob(jobId: string, userId: string): Promise<boolean> {
-    logger.info("### "+strLayer+" ### Starting deleteTodoItem ###")
+    logger.info("### "+strLayer+" ### Starting BL_deleteJob ###")
 
-    logger.info("### "+strLayer+" ### End of deleteTodoItem ###")
-    return await jobsDataAccess.deleteTodo(jobId, userId)
+    logger.info("### "+strLayer+" ### End of BL_deleteJob ###")
+    return await jobsDataAccess.deleteJob(jobId, userId)
 }
 // GENERATE Functions
 /* export async function generateUploadUrl(todoId: string, userId: string, event: any): Promise<any> {
