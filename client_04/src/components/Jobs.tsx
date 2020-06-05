@@ -12,7 +12,9 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
+  Label,
+  Pagination
 } from 'semantic-ui-react'
 
 import { createJob, deleteJob, getJobs, patchJob } from '../api/jobs-api'
@@ -29,21 +31,29 @@ interface JobsState {
   jobs: Job[]
   newJobName: string
   loadingJobs: boolean
+  isDisabled: boolean
 }
 
 export class Jobs extends React.PureComponent<JobsProps, JobsState> {
   state: JobsState = {
     jobs: [],
     newJobName: '',
-    loadingJobs: true
+    loadingJobs: true,
+    isDisabled: true
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newJobName: event.target.value })
+    this.state.isDisabled = false
+    if (this.state.newJobName.length<1)
+      this.state.isDisabled = true
   }
 
   onEditButtonClick = (jobId: string) => {
     this.props.history.push(`/jobs/${jobId}/edit`)
+  }
+  onConvertButtonClick = (jobId: string) => {
+    this.props.history.push(`/jobs/${jobId}/convert`)
   }
 
   onJobCreate = async (jobId: string) => { //event: React.ChangeEvent<HTMLButtonElement> entfernt als Input
@@ -137,17 +147,16 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
               <a className="close" onClick={close}>
                 &times;
               </a>
-              <div className="header"> Upload a new image </div>
+              <div className="header"> Upload a New Image </div>
               <div className="content">
                 {" "}
+                {this.state.isDisabled && (
+                  <Label basic color='red' pointing='below'>
+                  Please enter a value
+                  </Label>
+                )}
                 <Input
-                  action={{
-                    color: 'teal',
-                    labelPosition: 'left',
-                    icon: 'add',
-                    content: 'Add Image job'
-                    //,onClick: this.onJobCreate
-                  }}
+                  label='Image Job'
                   fluid
                   actionPosition="left"
                   placeholder="Name your image job..."
@@ -157,6 +166,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
               <div className="actions">
                 <button
                   className="button"
+                  disabled={this.state.isDisabled}
                   onClick={() => {
                     console.log("Popup closed ");
                     close();
@@ -168,8 +178,8 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
                 </button>
               </div>
             </div>
-    )}
-  </Popup>
+          )}
+        </Popup>
           <Divider />
         </Grid.Column>
       </Grid.Row>
@@ -197,49 +207,128 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
   renderJobsList() {
     console.log('JOBS ARRAY: ',this.state.jobs)
     return (
-      <Grid padded>        
+      <Grid columns={4} divided>        
         { this.state.jobs.map((job, pos) => {
           return (
             <Grid.Row key={job.jobId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  //onChange={() => this.onJobCheck(pos)}
-                  //checked={job.done}
-                />
+              <Grid.Column width={5} verticalAlign="middle" wrapped>
+                <Header as='h4'>
+                  {job.jobName}
+                </Header>
+                <Divider hidden />
+                  <Label>
+                    <Icon name='info' />
+                    Status
+                    <Label.Detail>{job.jobStatus}</Label.Detail>
+                  </Label>
               </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {job.jobName}
-              </Grid.Column>
-              <Grid.Column width={3} floated="right">
-                {job.createdAt}
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="blue"
-                  onClick={() => this.onEditButtonClick(job.jobId)}
-                >
-                  <Icon name="pencil" />
-                </Button>
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="red"
-                  onClick={() => this.onJobDelete(job.jobId)}
-                >
-                  <Icon name="delete" />
-                </Button>
-              </Grid.Column>
-              {job.imgUrl && (
-                <Image src={job.imgUrl} size="small" wrapped />
+              <Grid.Column width={8} verticalAlign="middle">
+              {!job.imgUrl && (
+                  <Divider hidden />
               )}
+              {job.imgUrl && (
+                  <Image src={job.imgUrl}
+                    size="medium"
+                    verticalAlign="middle" 
+                    as='a'
+                    href={job.imgUrl}
+                    target='_blank'
+                  />
+              )}
+              {job.imgUrl && (
+                  <Divider hidden />
+              )}
+              {job.vidUrl_01 && (
+                  <Image.Group size='mini' verticalAlign="middle" floated="right">
+                    <Image src={job.vidUrl_01} 
+                    as='a'
+                    href={job.vidUrl_01}
+                    target='_blank'
+                    />
+                  {job.vidUrl_02 && (
+                    <Image src={job.vidUrl_02} 
+                    as='a'
+                    href={job.vidUrl_02}
+                    target='_blank'
+                    />
+                  )}
+                  {job.vidUrl_03 && (
+                    <Image src={job.vidUrl_03} 
+                    as='a'
+                    href={job.vidUrl_03}
+                    target='_blank'
+                    />
+                  )}
+                  {job.vidUrl_04 && (
+                    <Image src={job.vidUrl_04} 
+                    as='a'
+                    href={job.vidUrl_04}
+                    target='_blank'
+                    />
+                  )}
+                  </Image.Group>
+                
+              )}
+              </Grid.Column>
+              <Grid.Column width={3} floated="right" verticalAlign="middle">
+                {job.jobStatus !== "created" && (
+                  
+                    <Button
+                      icon
+                      color="grey"
+                      disabled={true}
+                    >
+                      <Icon name="upload" />
+                    </Button>
+                )}
+                {job.jobStatus === "created" && (
+                    <Button
+                      icon
+                      color="blue"
+                      onClick={() => this.onEditButtonClick(job.jobId)}
+                      disabled={false}
+                    >
+                      <Icon name="upload" />
+                    </Button>
+                )}
+                {job.jobStatus === "image uploaded" && (
+                    <Button
+                      icon
+                      color="green"
+                      onClick={() => this.onConvertButtonClick(job.jobId)}
+                      disabled={false}
+                    >
+                      <Icon name="play" />
+                    </Button>
+                )}
+                {job.jobStatus !== "image uploaded" && (
+                    <Button
+                      icon
+                      color="grey"
+                      disabled={true}
+                    >
+                      <Icon name="play" />
+                    </Button>
+                )}
+                  <Button
+                    icon
+                    color="red"
+                    onClick={() => this.onJobDelete(job.jobId)}
+                  >
+                    <Icon name="delete" />
+                  </Button>
+              </Grid.Column>
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>
             </Grid.Row>
           )
         })}
+      <Grid.Row centered columns={2}>
+        <Grid.Column width={16} textAlign="center">
+          <Pagination defaultActivePage={1} disabled totalPages={5}/>
+        </Grid.Column>
+      </Grid.Row>
       </Grid>
     )
   }

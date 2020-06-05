@@ -1,8 +1,14 @@
 import * as React from 'react'
-import { Form, Button } from 'semantic-ui-react'
 import Auth from '../auth/Auth'
 import { getUploadUrl, uploadFile } from '../api/jobs-api'
-
+import {
+  Button,
+  Form,
+  Header,
+  Icon,
+  Segment,
+  Divider
+} from 'semantic-ui-react'
 enum UploadState {
   NoUpload,
   FetchingPresignedUrl,
@@ -72,12 +78,14 @@ export class EditJob extends React.PureComponent<
 
   render() {
     return (
-      <div>
-        <h1>Upload new image</h1>
-
+      <Segment placeholder>
+        <Header icon>
+          <Icon name='upload' />
+          Upload New Image
+        </Header>
         <Form onSubmit={this.handleSubmit}>
           <Form.Field>
-            <label>File</label>
+            <label>Select an Image File</label>
             <input
               type="file"
               accept="image/*"
@@ -85,17 +93,8 @@ export class EditJob extends React.PureComponent<
               onChange={this.handleFileChange}
             />
           </Form.Field>
-
-          {this.renderButton()}
         </Form>
-      </div>
-    )
-  }
-
-  renderButton() {
-
-    return (
-      <div>
+        <Divider hidden />
         {this.state.uploadState === UploadState.FetchingPresignedUrl && <p>Uploading image metadata</p>}
         {this.state.uploadState === UploadState.UploadingFile && <p>Uploading file</p>}
         <Button
@@ -104,7 +103,8 @@ export class EditJob extends React.PureComponent<
         >
           Upload
         </Button>
-      </div>
+      </Segment>
+      
     )
   }
 }
