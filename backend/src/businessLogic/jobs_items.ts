@@ -4,7 +4,6 @@ import { JobStatus } from '../models/JobStatus'
 import { Jobs_Data_Access } from '../dataLayer/jobs_access_aws'
 import { CreateJobRequest } from '../requests/CreateJobRequest'
 import { UpdateJobStatusRequest } from '../requests/UpdateJobStatusRequest'
-import * as uuid from 'uuid'
 
 const jobsDataAccess = new Jobs_Data_Access()
 const strLayer = "BUSINESS-LOGIC"
@@ -31,11 +30,10 @@ export async function BL_getJobItems(userId: string): Promise<JobItem[]> {
  */
 export async function BL_createJob(createJobRequest: CreateJobRequest, userId: string): Promise<JobItem> {
     logger.info("### "+strLayer+" ### Starting BL_createJob ###")
-    const newJobId = uuid.v4()
     logger.info("### "+strLayer+" ### End of BL_createJob ###")
     return await jobsDataAccess
         .createJob({
-            jobId: newJobId,
+            jobId: createJobRequest.jobId,
             userId: userId,
             createdAt: createJobRequest.createdAt,
             jobName: createJobRequest.jobName,

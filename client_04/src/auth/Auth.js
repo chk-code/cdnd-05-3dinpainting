@@ -28,6 +28,7 @@ export default class Auth {
 
   login() {
     this.auth0.authorize();
+    //this.auth0.popup.authorize({}, function(err, response) {}); User popup for login
   }
 
   handleAuthentication() {
@@ -36,6 +37,7 @@ export default class Auth {
         console.log('Access token: ', authResult.accessToken)
         console.log('id token: ', authResult.idToken)
         this.setSession(authResult);
+        //this.auth0.popup.callback(); Close popup after auth
       } else if (err) {
         this.history.replace('/');
         console.log(err);
@@ -88,7 +90,9 @@ export default class Auth {
     localStorage.removeItem('isLoggedIn');
 
     this.auth0.logout({
-      return_to: window.location.origin
+      //return_to: window.location.origin
+      returnTo: 'http://localhost:3000',
+      clientID: 'ETvMUHWVGQqIneQ0dSDOAzcCp65RuSLF',
     });
 
     // navigate to the home route
@@ -100,5 +104,14 @@ export default class Auth {
     // access token's expiry time
     let expiresAt = this.expiresAt;
     return new Date().getTime() < expiresAt;
+  }
+  silentAuth() {
+    return new Promise((resolve, reject) => {
+      this.auth0.checkSession({}, (err, authResult) => {
+        if (err) return reject(err);
+        this.setSession(authResult);
+        resolve();
+      });
+    });
   }
 }

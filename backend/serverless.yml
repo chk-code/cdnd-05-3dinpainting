@@ -110,6 +110,7 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+        
   UpdateJob:
     handler: src/lambda/http/updateJob.handler
     events:

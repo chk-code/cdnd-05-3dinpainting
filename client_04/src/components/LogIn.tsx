@@ -1,6 +1,8 @@
 import * as React from 'react'
 import Auth from '../auth/Auth'
-import { Button } from 'semantic-ui-react'
+//import { Button } from 'semantic-ui-react'
+
+import SignInSide from './SignInSide'
 
 interface LogInProps {
   auth: Auth
@@ -12,16 +14,19 @@ export class LogIn extends React.PureComponent<LogInProps, LogInState> {
   onLogin = () => {
     this.props.auth.login()
   }
-
   render() {
     return (
-      <div>
+      // OLD STYLE
+      /* <div>
         <h1>Please log in</h1>
 
         <Button onClick={this.onLogin} size="huge" color="olive">
           Log in
         </Button>
-      </div>
+      </div> */
+      <SignInSide onClickHandler={this.onLogin}/>
     )
   }
 }
+
+

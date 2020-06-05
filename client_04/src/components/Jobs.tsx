@@ -2,6 +2,7 @@ import dateFormat from 'dateformat'
 import { History } from 'history'
 import update from 'immutability-helper'
 import * as React from 'react'
+import Popup from "reactjs-popup";
 import {
   Button,
   Checkbox,
@@ -17,6 +18,7 @@ import {
 import { createJob, deleteJob, getJobs, patchJob } from '../api/jobs-api'
 import Auth from '../auth/Auth'
 import { Job } from '../types/Job'
+import * as uuid from 'uuid'
 
 interface JobsProps {
   auth: Auth
@@ -44,10 +46,12 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
     this.props.history.push(`/jobs/${jobId}/edit`)
   }
 
-  onJobCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+  onJobCreate = async (jobId: string) => { //event: React.ChangeEvent<HTMLButtonElement> entfernt als Input
     try {
       const creationDate = new Date().toISOString()
+      
       const newJob = await createJob(this.props.auth.getIdToken(), {
+        jobId: jobId,
         jobName: this.state.newJobName,
         createdAt: creationDate
       })
@@ -89,6 +93,13 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
   } */
 
   async componentDidMount() {
+    //if (this.props.location.pathname === '/callback') return;
+    try {
+      await this.props.auth.silentAuth();
+      this.forceUpdate();
+    } catch (err) {
+      if (err.error !== 'login_required') console.log(err.error);
+    }
     try {
       const jobs = await getJobs(this.props.auth.getIdToken())
       this.setState({
@@ -102,7 +113,8 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
 
   render() {
     return (
-      <div>
+      <div className="header-img">
+        <img src={require('../favicons/favicon-32x32.png')} alt="logo" />
         <Header as="h1">Your image conversion jobs</Header>
 
         {this.renderCreateJobInput()}
@@ -113,24 +125,51 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
   }
 
   renderCreateJobInput() {
+    const newJobId = uuid.v4()
     return (
       <Grid.Row>
         <Grid.Column width={16}>
-          <Input
-            action={{
-              color: 'teal',
-              labelPosition: 'left',
-              icon: 'add',
-              content: 'Add Image job',
-              onClick: this.onJobCreate
-            }}
-            fluid
-            actionPosition="left"
-            placeholder="To change the world..."
-            onChange={this.handleNameChange}
-          />
         </Grid.Column>
         <Grid.Column width={16}>
+        <Popup trigger={<button className="button"> Upload an image </button>} modal>
+          {close => (
+            <div className="modal">
+              <a className="close" onClick={close}>
+                &times;
+              </a>
+              <div className="header"> Upload a new image </div>
+              <div className="content">
+                {" "}
+                <Input
+                  action={{
+                    color: 'teal',
+                    labelPosition: 'left',
+                    icon: 'add',
+                    content: 'Add Image job'
+                    //,onClick: this.onJobCreate
+                  }}
+                  fluid
+                  actionPosition="left"
+                  placeholder="Name your image job..."
+                  onChange={this.handleNameChange}
+                />
+              </div>
+              <div className="actions">
+                <button
+                  className="button"
+                  onClick={() => {
+                    console.log("Popup closed ");
+                    close();
+                    this.onJobCreate(newJobId);
+                    this.onEditButtonClick(newJobId)
+                  }}
+                >
+                  Upload image and add a new job for conversion
+                </button>
+              </div>
+            </div>
+    )}
+  </Popup>
           <Divider />
         </Grid.Column>
       </Grid.Row>
