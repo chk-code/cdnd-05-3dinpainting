@@ -110,6 +110,24 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+  UpdateJob:
+    handler: src/lambda/http/updateJob.handler
+    events:
+      - http:
+          method: patch
+          path: jobs/{jobId}
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          authorizer: Auth
+          documentation:
+            summary: Update a Job Status
+            description: Update a Job Status
+    iamRoleStatementsName: UpdateJobStatus-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
 
   DeleteJob:
     handler: src/lambda/http/deleteJob.handler
