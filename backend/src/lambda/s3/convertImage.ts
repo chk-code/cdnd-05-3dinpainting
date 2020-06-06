@@ -1,12 +1,11 @@
 import { SNSEvent, SNSHandler, S3EventRecord } from 'aws-lambda'
 import 'source-map-support/register'
 import * as AWS from 'aws-sdk'
-//import Jimp = require('jimp')
-import * as Jimp from 'jimp'
+import Jimp from 'jimp/es';
 import { createLogger } from '../../utils/logger'
 
 
-const logger = createLogger('resize-image')
+const logger = createLogger('process-image')
 const s3 = new AWS.S3({
     signatureVersion: 'v4'
 })
@@ -32,7 +31,7 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
 // THUMBNAIL AND POSTERIZE
 async function processImage(record: S3EventRecord, option: number) {
     const key = record.s3.object.key
-    logger.info('Processing S3 item with key: ', key)
+    logger.info("Processing S3 item with key: "+key.toString())
     const response = await s3
         .getObject({
             Bucket: imagesBucketName,

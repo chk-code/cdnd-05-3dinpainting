@@ -3,6 +3,8 @@
     "lib": [
       "es2017"
     ],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
