@@ -155,6 +155,7 @@ functions:
         Action:
           - s3:DeleteObject
           - s3:GetObject
+          - s3:headObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}/*
       - Effect: Allow
         Action:
@@ -164,6 +165,7 @@ functions:
         Action:
           - s3:GetObject
           - s3:DeleteObject
+          - s3:headObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}/*
 
   NewImgNotifications:

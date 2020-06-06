@@ -274,11 +274,23 @@ export class Jobs_Data_Access{
     async deleteImageS3(jobId: string, bucketName: string): Promise<boolean> {
       logger.info("### "+strLayer+" ### Starting deleteImageS3 ###")
       const filename = jobId+".jpg"
-      const respDel = await s3.deleteObject({
-        Bucket: bucketName,
+      let params = {
+        Bucket: bucketName, 
         Key: filename
-      })
-      logger.info("### "+strLayer+" ### Response of deleteImageS3 ###", respDel)
+       }
+      try {
+        await s3.headObject(params).promise()
+        logger.info("### "+strLayer+" ### File Found in S3")
+        try {
+          const respDel = await s3.deleteObject(params).promise()
+          logger.info("### "+strLayer+" ### File deleted Successfully", respDel)
+        }
+        catch (err) {
+          logger.error("### "+strLayer+" ### ERROR in file Deleting : " + JSON.stringify(err))
+        }
+      } catch (err) {
+        logger.info("### "+strLayer+" ### File not Found ERROR : " + err.code)
+      }
       logger.info("### "+strLayer+" ### End of deleteImageS3 ###")
       return true
     }
