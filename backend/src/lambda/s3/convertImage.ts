@@ -51,7 +51,7 @@ async function processImage(record: S3EventRecord, option: number) {
                 logger.info("Posterize Start");
                 image.posterize( 5 );
                 keyname = key
-                keyname.replace(".jpg","-01.jpg")
+                keyname = keyname.replace(".jpg","-01.jpg")
                 logger.info("Posterize End "+keyname);
                break; 
             } 
@@ -59,7 +59,7 @@ async function processImage(record: S3EventRecord, option: number) {
                 logger.info("Sepia Start");
                 image.sepia();
                 keyname = key
-                keyname.replace(".jpg","-02.jpg")
+                keyname = keyname.replace(".jpg","-02.jpg")
                 logger.info("Sepia End "+keyname);
                break; 
             } 
@@ -67,7 +67,7 @@ async function processImage(record: S3EventRecord, option: number) {
                 logger.info("Greyscale Start");
                 image.greyscale();
                 keyname = key
-                keyname.replace(".jpg","-03.jpg")
+                keyname = keyname.replace(".jpg","-03.jpg")
                 logger.info("Greyscale End "+keyname);
                 break; 
             }
@@ -75,7 +75,7 @@ async function processImage(record: S3EventRecord, option: number) {
                 logger.info("Inverted Start");
                 image.invert(); 
                 keyname = key
-                keyname.replace(".jpg","-04.jpg")
+                keyname = keyname.replace(".jpg","-04.jpg")
                 logger.info("Inverted End "+keyname);
                 break; 
             }
