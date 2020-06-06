@@ -18,7 +18,7 @@ provider:
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-central-1'}
-  
+  timeout: 8 # optional, in seconds, default is 6
   tracing:
     lambda: true
     apiGateway: true
@@ -176,6 +176,7 @@ functions:
         Action:
           - s3:PutObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}/*
+    timeout: 16 # optional, in seconds, default is 6
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
