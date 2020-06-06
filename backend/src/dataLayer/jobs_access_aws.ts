@@ -102,6 +102,21 @@ export class Jobs_Data_Access{
         logger.info("### "+strLayer+" ### End of generateUploadUrl ###")
         return signedURL
     }
+    /**
+     * Get an element of S3 Bucket or the specified Job element
+     * @param jobId Id of an specific Job Element
+     * @param bucketName an specific S3 bucket
+     * @returns the S3 object
+    */
+   async getImageS3(jobId: string, bucketName: string): Promise<any> {
+    logger.info("### "+strLayer+" ### Starting getImageS3 ###")
+    const ret =  await s3.getObject({
+      Bucket: bucketName,
+      Key: jobId
+    })
+    logger.info("### "+strLayer+" ### End of getImageS3 ###")
+    return ret
+  }
     // CREATE Functions
     /**
      * Create in DynamoDB a new Entry for the specified Job element
@@ -247,6 +262,12 @@ export class Jobs_Data_Access{
         // Return true = Job Item deleted
         return true
     }
+    /**
+     * Delete in S3 Bucket an element for the specified Job element
+     * @param jobId Id of an specific Job Element
+     * @param bucketName an specific S3 bucket
+     * @returns true, if deletion completed
+    */
     async deleteImageS3(jobId: string, bucketName: string): Promise<boolean> {
       logger.info("### "+strLayer+" ### Starting deleteImageS3 ###")
       await s3.deleteObject({
@@ -256,16 +277,7 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### End of deleteImageS3 ###")
       return true
     }
-  
-    async getImageS3(jobId: string, bucketName: string): Promise<any> {
-      logger.info("### "+strLayer+" ### Starting getImageS3 ###")
-      const ret =  await s3.getObject({
-        Bucket: bucketName,
-        Key: jobId
-      })
-      logger.info("### "+strLayer+" ### End of getImageS3 ###")
-      return ret
-    }
+
     // GENERATE Functions
     // Nothing yet
 }

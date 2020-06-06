@@ -149,10 +149,12 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
       - Effect: Allow
         Action:
+          - s3:GetObject
           - s3:DeleteObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}
       - Effect: Allow
         Action:
+          - s3:GetObject
           - s3:DeleteObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}
 
