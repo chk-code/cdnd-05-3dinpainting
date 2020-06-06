@@ -1,8 +1,10 @@
 import { SNSEvent, SNSHandler, S3EventRecord } from 'aws-lambda'
 import 'source-map-support/register'
 import * as AWS from 'aws-sdk'
-import * as Jimp from 'jimp/es'
+//import Jimp = require('jimp')
+import * as Jimp from 'jimp'
 import { createLogger } from '../../utils/logger'
+
 
 const logger = createLogger('resize-image')
 const s3 = new AWS.S3({

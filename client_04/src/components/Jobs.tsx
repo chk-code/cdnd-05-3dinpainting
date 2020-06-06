@@ -1,11 +1,11 @@
-import dateFormat from 'dateformat'
+//import dateFormat from 'dateformat'
 import { History } from 'history'
-import update from 'immutability-helper'
+//import update from 'immutability-helper'
 import * as React from 'react'
 import Popup from "reactjs-popup";
 import {
   Button,
-  Checkbox,
+
   Divider,
   Grid,
   Header,
@@ -44,9 +44,9 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newJobName: event.target.value })
-    this.state.isDisabled = false
+    this.setState({ isDisabled: false })
     if (this.state.newJobName.length<1)
-      this.state.isDisabled = true
+      this.setState({ isDisabled: true })
   }
 
   onEditButtonClick = (jobId: string) => {
@@ -62,7 +62,8 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
         jobId: jobId,
         jobStatus: "processing"
       })
-      const convJob = await convertJob(this.props.auth.getIdToken(), jobId)
+      //this.setState({loadingJobs: true})
+      await convertJob(this.props.auth.getIdToken(), jobId)
     } catch {
       alert('Job conversion failed')
     }

@@ -26,6 +26,7 @@ export class Jobs_Data_Access{
         private readonly idxJobsUserId = process.env.IDX_JOBS_USERID,
         // private readonly idxJobsName = process.env.IDX_JOBS_NAME
         //S3
+        private readonly countVids = 4,
         private readonly s3bckIMGS = process.env.S3_IMGS,
         private readonly s3bckVIDS = process.env.S3_VIDS,
         private readonly urlExpiration = process.env.SIGNED_URL_EXPIRATION
@@ -216,7 +217,18 @@ export class Jobs_Data_Access{
     */
     async deleteJob(jobId: string, userId: string): Promise<boolean> {
         logger.info("### "+strLayer+" ### Starting deleteJob ###")
-        // TODO: Delete also S3 Images and Videos
+        // Delete S3 Images
+        if(await this.getImageS3(jobId,this.s3bckIMGS)){
+          await this.deleteImageS3(jobId,this.s3bckIMGS)
+        }
+        // Delete S3 Videos
+        for (var _i = 1; _i < this.countVids+1; _i++) {
+          let vidfile = "-0"+_i.toString()
+          logger.info("### "+strLayer+" ### jobId and vidfile = "+jobId+vidfile+" ###")
+          if(await this.getImageS3(jobId+vidfile,this.s3bckIMGS)){
+            await this.deleteImageS3(jobId+vidfile,this.s3bckIMGS)
+          }
+        }      
         const delRes = await this.docClient.delete({
         TableName: this.jobsTable,
         Key:
@@ -234,6 +246,25 @@ export class Jobs_Data_Access{
         logger.info("### "+strLayer+" ### End of deleteJob ###")
         // Return true = Job Item deleted
         return true
+    }
+    async deleteImageS3(jobId: string, bucketName: string): Promise<boolean> {
+      logger.info("### "+strLayer+" ### Starting deleteImageS3 ###")
+      await s3.deleteObject({
+        Bucket: bucketName,
+        Key: jobId
+      })
+      logger.info("### "+strLayer+" ### End of deleteImageS3 ###")
+      return true
+    }
+  
+    async getImageS3(jobId: string, bucketName: string): Promise<any> {
+      logger.info("### "+strLayer+" ### Starting getImageS3 ###")
+      const ret =  await s3.getObject({
+        Bucket: bucketName,
+        Key: jobId
+      })
+      logger.info("### "+strLayer+" ### End of getImageS3 ###")
+      return ret
     }
     // GENERATE Functions
     // Nothing yet

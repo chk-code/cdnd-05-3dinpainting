@@ -93,8 +93,16 @@ export class EditJob extends React.PureComponent<
               onChange={this.handleFileChange}
             />
           </Form.Field>
+          {this.renderButton()}
         </Form>
-        <Divider hidden />
+      </Segment>
+      
+    )
+  }
+  renderButton() {
+
+    return (
+      <div>
         {this.state.uploadState === UploadState.FetchingPresignedUrl && <p>Uploading image metadata</p>}
         {this.state.uploadState === UploadState.UploadingFile && <p>Uploading file</p>}
         <Button
@@ -103,8 +111,7 @@ export class EditJob extends React.PureComponent<
         >
           Upload
         </Button>
-      </Segment>
-      
+      </div>
     )
   }
 }
