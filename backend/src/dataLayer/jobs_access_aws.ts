@@ -225,8 +225,8 @@ export class Jobs_Data_Access{
         for (var _i = 1; _i < this.countVids+1; _i++) {
           let vidfile = "-0"+_i.toString()
           logger.info("### "+strLayer+" ### jobId and vidfile = "+jobId+vidfile+" ###")
-          if(await this.getImageS3(jobId+vidfile,this.s3bckIMGS)){
-            await this.deleteImageS3(jobId+vidfile,this.s3bckIMGS)
+          if(await this.getImageS3(jobId+vidfile,this.s3bckVIDS)){
+            await this.deleteImageS3(jobId+vidfile,this.s3bckVIDS)
           }
         }      
         const delRes = await this.docClient.delete({
