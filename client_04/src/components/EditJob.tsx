@@ -88,7 +88,7 @@ export class EditJob extends React.PureComponent<
             <label>Select an Image File</label>
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpg"
               placeholder="Image to upload"
               onChange={this.handleFileChange}
             />

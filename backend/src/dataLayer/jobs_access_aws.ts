@@ -93,10 +93,11 @@ export class Jobs_Data_Access{
      * @returns the requested signed URL from S3
     */
     async getUploadUrl(jobId: string, event: any): Promise<string> {
-        logger.info("### "+strLayer+" ### Starting getUploadUrl for JobId "+event.pathParameters.jobId+" ###")
+      const filename = jobId+".jpg"  
+      logger.info("### "+strLayer+" ### Starting getUploadUrl for JobId "+event.pathParameters.jobId+" ###")
         const signedURL = await s3.getSignedUrl('putObject', {
             Bucket: this.s3bckIMGS,
-            Key: jobId,
+            Key: filename,
             Expires: parseInt(this.urlExpiration)
         })
         logger.info("### "+strLayer+" ### End of generateUploadUrl ###")
@@ -109,11 +110,13 @@ export class Jobs_Data_Access{
      * @returns the S3 object
     */
    async getImageS3(jobId: string, bucketName: string): Promise<any> {
+    const filename = jobId+".jpg" 
     logger.info("### "+strLayer+" ### Starting getImageS3 ###")
     const ret =  await s3.getObject({
       Bucket: bucketName,
-      Key: jobId
+      Key: filename
     })
+    logger.info("### "+strLayer+" ### Result of getImageS3 ###",ret)
     logger.info("### "+strLayer+" ### End of getImageS3 ###")
     return ret
   }
@@ -171,7 +174,7 @@ export class Jobs_Data_Access{
     */
     async updateJobImgURL(jobId: string, userId: string): Promise<JobItem> {
         logger.info("### "+strLayer+" ### Starting updateJobImgURL ###")
-        const imgURL = `https://${this.s3bckIMGS}.s3.amazonaws.com/${jobId}`
+        const imgURL = `https://${this.s3bckIMGS}.s3.amazonaws.com/${jobId}.jpg`
         const tblKey = {
           jobId: jobId,
           userId: userId
@@ -198,10 +201,10 @@ export class Jobs_Data_Access{
     */
     async updateJobVidURLs(jobId: string, userId: string): Promise<any> {
       logger.info("### "+strLayer+" ### Starting updateJobVidURLs ###")
-      const vidURL01 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-01`
-      const vidURL02 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-02`
-      const vidURL03 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-03`
-      const vidURL04 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-04`
+      const vidURL01 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-01.jpg`
+      const vidURL02 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-02.jpg`
+      const vidURL03 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-03.jpg`
+      const vidURL04 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-04.jpg`
       const tblKey = {
         jobId: jobId,
         userId: userId
@@ -270,10 +273,12 @@ export class Jobs_Data_Access{
     */
     async deleteImageS3(jobId: string, bucketName: string): Promise<boolean> {
       logger.info("### "+strLayer+" ### Starting deleteImageS3 ###")
-      await s3.deleteObject({
+      const filename = jobId+".jpg"
+      const respDel = await s3.deleteObject({
         Bucket: bucketName,
-        Key: jobId
+        Key: filename
       })
+      logger.info("### "+strLayer+" ### Response of deleteImageS3 ###", respDel)
       logger.info("### "+strLayer+" ### End of deleteImageS3 ###")
       return true
     }

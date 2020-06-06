@@ -4,7 +4,6 @@ import * as AWS from 'aws-sdk'
 import Jimp from 'jimp/es';
 import { createLogger } from '../../utils/logger'
 
-
 const logger = createLogger('process-image')
 const s3 = new AWS.S3({
     signatureVersion: 'v4'
@@ -31,6 +30,7 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
 
 async function processImage(record: S3EventRecord, option: number) {
     const key = record.s3.object.key
+    const resizeTo = 1500
     logger.info("Processing S3 item with key: "+key.toString())
     const response = await s3
         .getObject({
@@ -43,32 +43,36 @@ async function processImage(record: S3EventRecord, option: number) {
         const body = response.Body; // type narrowed to 'Buffer'
         const image = await Jimp.read(body)
         logger.info('Resizing image');
-        image.resize(150, Jimp.AUTO);
+        image.resize(resizeTo, Jimp.AUTO);
         let keyname = "empty"
         // CASE option
         switch(option) { 
             case 1: { 
-                logger.info("Posterize "+keyname);
+                logger.info("Posterize Start");
                 image.posterize( 5 );  
-                keyname = `${key}-01`
+                keyname = `${key}-01.jpg`
+                logger.info("Posterize End "+keyname);
                break; 
             } 
             case 2: { 
-                logger.info("Sepia "+keyname);
+                logger.info("Sepia Start");
                 image.sepia();
-                keyname = `${key}-02`
+                keyname = `${key}-02.jpg`
+                logger.info("Sepia End "+keyname);
                break; 
             } 
             case 3: { 
-                logger.info("Greyscale "+keyname);
+                logger.info("Greyscale Start");
                 image.greyscale();
-                keyname = `${key}-03`
+                keyname = `${key}-03.jpg`
+                logger.info("Greyscale End "+keyname);
                 break; 
             }
             case 4: { 
-                logger.info("Inverted "+keyname);
+                logger.info("Inverted Start");
                 image.invert(); 
-                keyname = `${key}-04`
+                keyname = `${key}-04.jpg`
+                logger.info("Inverted End "+keyname);
                 break; 
             }
          }
