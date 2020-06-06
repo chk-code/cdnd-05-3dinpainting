@@ -49,29 +49,33 @@ async function processImage(record: S3EventRecord, option: number) {
         switch(option) { 
             case 1: { 
                 logger.info("Posterize Start");
-                image.posterize( 5 );  
-                keyname = `${key}-01.jpg`
+                image.posterize( 5 );
+                keyname = key
+                keyname.replace(".jpg","-01.jpg")
                 logger.info("Posterize End "+keyname);
                break; 
             } 
             case 2: { 
                 logger.info("Sepia Start");
                 image.sepia();
-                keyname = `${key}-02.jpg`
+                keyname = key
+                keyname.replace(".jpg","-02.jpg")
                 logger.info("Sepia End "+keyname);
                break; 
             } 
             case 3: { 
                 logger.info("Greyscale Start");
                 image.greyscale();
-                keyname = `${key}-03.jpg`
+                keyname = key
+                keyname.replace(".jpg","-03.jpg")
                 logger.info("Greyscale End "+keyname);
                 break; 
             }
             case 4: { 
                 logger.info("Inverted Start");
                 image.invert(); 
-                keyname = `${key}-04.jpg`
+                keyname = key
+                keyname.replace(".jpg","-04.jpg")
                 logger.info("Inverted End "+keyname);
                 break; 
             }
