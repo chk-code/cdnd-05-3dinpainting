@@ -110,7 +110,7 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
-        
+
   UpdateJob:
     handler: src/lambda/http/updateJob.handler
     events:
@@ -160,6 +160,55 @@ functions:
     handler: src/lambda/s3/convertImage.handler
     events:
     - sns: arn:aws:sns:eu-central-1:335400721406:sls-3dinpainting-app-imgs-dev-SNSTopic
+
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: jobs/{jobId}/uploadimg
+          authorizer: Auth
+          cors: true
+          documentation:
+            summary: Create a new image for conversion
+            description: Create a new image for conversion
+    iamRoleStatementsName: GenerateUploadURL-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}/index/${self:provider.environment.IDX_JOBS_JOBID}
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}/*
+
+  ConvertJob:
+    handler: src/lambda/http/convertJob.handler
+    events:
+      - http:
+          method: post
+          path: jobs/{jobId}/convert
+          authorizer: Auth
+          cors: true
+          documentation:
+            summary: Convert an image 
+            description: Convert an image
+    iamRoleStatementsName: ConvertJob-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}/index/${self:provider.environment.IDX_JOBS_JOBID}
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
 
 resources:
   Resources:

@@ -6,11 +6,12 @@ const strLayer = "DATA-LAYER"
 const logger = createLogger(strLayer)
 
 const XAWS = AWSXRay.captureAWS(AWS) 
-/* const s3 = new XAWS.S3({
+const s3 = new XAWS.S3({
   signatureVersion: 'v4'
-}) */
+})
 
 import { JobItem } from '../models/JobItem'
+import { JobStatus } from '../models/JobStatus'
 
 export class Jobs_Data_Access{
     /**
@@ -25,6 +26,9 @@ export class Jobs_Data_Access{
         private readonly idxJobsUserId = process.env.IDX_JOBS_USERID,
         // private readonly idxJobsName = process.env.IDX_JOBS_NAME
         //S3
+        private readonly s3bckIMGS = process.env.S3_IMGS,
+        private readonly s3bckVIDS = process.env.S3_VIDS,
+        private readonly urlExpiration = process.env.SIGNED_URL_EXPIRATION
         ){
         }
     
@@ -81,17 +85,22 @@ export class Jobs_Data_Access{
         logger.info("### "+strLayer+" ### End of getJobsByUserId ###")
         return items as JobItem[]
     }
-    /* async getUploadUrl(todoId: string, event: any): Promise<string> {
-        logger.info("### Starting getUploadUrl ###")
+    /**
+     * Return a S3 signed Upload URL for a specific Job Element
+     * @param jobId an specific ID of a Job
+     * @param event the request event
+     * @returns the requested signed URL from S3
+    */
+    async getUploadUrl(jobId: string, event: any): Promise<string> {
+        logger.info("### "+strLayer+" ### Starting getUploadUrl for JobId "+event.pathParameters.jobId+" ###")
         const signedURL = await s3.getSignedUrl('putObject', {
-            Bucket: this.bucketName,
-            Key: todoId,
+            Bucket: this.s3bckIMGS,
+            Key: jobId,
             Expires: parseInt(this.urlExpiration)
         })
-        await this.createImage(todoId,event)
-        logger.info("### End of generateUploadUrl ###")
+        logger.info("### "+strLayer+" ### End of generateUploadUrl ###")
         return signedURL
-    } */
+    }
     // CREATE Functions
     /**
      * Create in DynamoDB a new Entry for the specified Job element
@@ -108,24 +117,15 @@ export class Jobs_Data_Access{
         logger.info("### "+strLayer+" ### End of createJob ###", putResult)
         return jobItem
     }
-   /*  async createImage(todoId: string, event: any) {
-        const timestamp = new Date().toISOString()
-        const newImage = JSON.parse(event.body)
-        const imageId = todoId
-        const newImgItem = {
-          todoId,
-          timestamp,
-          imageId,
-          ...newImage,
-          imageUrl: `https://${this.bucketName}.s3.amazonaws.com/${imageId}`
-        }
-        logger.info('Storing new Image item in Image DB: ', newImgItem)
-        await this.docClient.put({
-            TableName: this.attImgsTable,
-            Item: newImgItem
-          }).promise()
-    } */
+
     // UPDATE Functions
+    /**
+     * Update the Job Status for the specified Job element
+     * @param jobId an specific Job Element of type JobItem
+     * @param userId an specific ID of an User
+     * @param updateJobStatus The data for the update
+     * @returns the updated Job element
+    */
     async updateJobStatus(jobId: string, userId: string, updateJobStatus: any): Promise<JobItem> {
         logger.info("### "+strLayer+" ### Starting updateJobStatus ###")
         const tblKey = {
@@ -147,25 +147,66 @@ export class Jobs_Data_Access{
         logger.info("### "+strLayer+" ### End of updateJobStatus ###")
         return resUpd.$response.data as JobItem  
     }
-    /* async updateTodoURL(todoId: string, userId: string): Promise<TodoItem> {
-        logger.info("### Starting updateTodoURL ###")
-        const imgURL = `https://${this.bucketName}.s3.amazonaws.com/${todoId}`
+    /**
+     * Update the image URL for the specified Job element
+     * @param jobItem an specific Job Element of type JobItem
+     * @param userId an specific ID of an User
+     * @returns the updated Job element
+    */
+    async updateJobImgURL(jobId: string, userId: string): Promise<JobItem> {
+        logger.info("### "+strLayer+" ### Starting updateJobImgURL ###")
+        const imgURL = `https://${this.s3bckIMGS}.s3.amazonaws.com/${jobId}`
         const tblKey = {
-          todoId: todoId,
+          jobId: jobId,
           userId: userId
         }
+        logger.info("### "+strLayer+" ### Updating DynamoDB after Image Upload ###")
         const resUpd = await this.docClient.update({
-            TableName: this.todoTable,
+            TableName: this.jobsTable,
             Key: tblKey,
-            UpdateExpression: 'set attachmentUrl = :attUrl',
+            UpdateExpression: 'set imgUrl = :iUrl, jobStatus = :jS',
             ExpressionAttributeValues:{
-              ':attUrl' : imgURL,
+              ':jS' : JobStatus.img_uploaded,
+              ':iUrl' : imgURL,
               },
             ReturnValues: "UPDATED_NEW"
           }).promise()  
-          logger.info("### End of updateTodoURL ###")
-        return resUpd.$response.data as TodoItem  
-    } */
+        logger.info("### "+strLayer+" ### End of updateJobImgURL ###")
+        return resUpd.$response.data as JobItem  
+    }
+    /**
+     * Update the vid URLs for the specified Job element
+     * @param jobItem an specific Job Element of type JobItem
+     * 
+     * @returns true, if function completes
+    */
+    async updateJobVidURLs(jobId: string, userId: string): Promise<any> {
+      logger.info("### "+strLayer+" ### Starting updateJobVidURLs ###")
+      const vidURL01 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-01`
+      const vidURL02 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-02`
+      const vidURL03 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-03`
+      const vidURL04 = `https://${this.s3bckVIDS}.s3.amazonaws.com/${jobId}-04`
+      const tblKey = {
+        jobId: jobId,
+        userId: userId
+      }
+      logger.info("### "+strLayer+" ### Updating DynamoDB for Video URLs ###")
+      await this.docClient.update({
+          TableName: this.jobsTable,
+          Key: tblKey,
+          UpdateExpression: 'set vidUrl_01 = :iV1, vidUrl_02 = :iV2, vidUrl_03 = :iV3, vidUrl_04 = :iV4, jobStatus = :jS',
+          ExpressionAttributeValues:{
+            ':iV1' : vidURL01,
+            ':iV2' : vidURL02,
+            ':iV3' : vidURL03,
+            ':iV4' : vidURL04,
+            ':jS' : JobStatus.done,
+            },
+          ReturnValues: "UPDATED_NEW"
+        }).promise()  
+      logger.info("### "+strLayer+" ### End of updateJobVidURLs ###")
+      return true
+    }
     // DELETE Functions
     /**
      * Delete in DynamoDB an entry for the specified Job element

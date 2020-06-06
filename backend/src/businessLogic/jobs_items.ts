@@ -70,12 +70,19 @@ export async function BL_deleteJob(jobId: string, userId: string): Promise<boole
     return await jobsDataAccess.deleteJob(jobId, userId)
 }
 // GENERATE Functions
-/* export async function generateUploadUrl(todoId: string, userId: string, event: any): Promise<any> {
-    logger.info("### Starting generateUploadUrl ###")
-    const signedUrl = await todoDataAccess.getUploadUrl(todoId,event)
-    logger.info("The signed URL is "+signedUrl)
-    const resUpd = await todoDataAccess.updateTodoURL(todoId,userId)
+export async function BL_generateUploadUrl(jobId: string, userId: string, event: any): Promise<any> {
+    logger.info("### "+strLayer+" ### Starting BL_generateUploadUrl ###")
+    const signedUrl = await jobsDataAccess.getUploadUrl(jobId,event)
+    logger.info("### "+strLayer+" ### The signed URL is "+signedUrl)
+    const resUpd = await jobsDataAccess.updateJobImgURL(jobId,userId)
  
-    logger.info("### End of generateUploadUrl ###")
-    return {updTodoItem: resUpd, uploadUrl: signedUrl} 
-} */
+    logger.info("### "+strLayer+" ### End of BL_generateUploadUrl ###")
+    return {updJobItem: resUpd, uploadUrl: signedUrl} 
+}
+
+export async function BL_convertJob(jobId: string, userId: string): Promise<any> {
+    logger.info("### "+strLayer+" ### Starting BL_convertJob ###")
+    const resUpd = await jobsDataAccess.updateJobVidURLs(jobId, userId)
+    logger.info("### "+strLayer+" ### End of BL_convertJob ###")
+    return {URLs_created: resUpd} 
+}

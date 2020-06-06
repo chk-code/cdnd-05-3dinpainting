@@ -17,7 +17,7 @@ import {
   Pagination
 } from 'semantic-ui-react'
 
-import { createJob, deleteJob, getJobs, patchJob } from '../api/jobs-api'
+import { createJob, deleteJob, getJobs, convertJob, patchJob } from '../api/jobs-api'
 import Auth from '../auth/Auth'
 import { Job } from '../types/Job'
 import * as uuid from 'uuid'
@@ -54,6 +54,18 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
   }
   onConvertButtonClick = (jobId: string) => {
     this.props.history.push(`/jobs/${jobId}/convert`)
+  }
+
+  onJobConvert = async (jobId: string) => { 
+    try {
+      await patchJob(this.props.auth.getIdToken(), jobId, {
+        jobId: jobId,
+        jobStatus: "processing"
+      })
+      const convJob = await convertJob(this.props.auth.getIdToken(), jobId)
+    } catch {
+      alert('Job conversion failed')
+    }
   }
 
   onJobCreate = async (jobId: string) => { //event: React.ChangeEvent<HTMLButtonElement> entfernt als Input
@@ -295,7 +307,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
                     <Button
                       icon
                       color="green"
-                      onClick={() => this.onConvertButtonClick(job.jobId)}
+                      onClick={() => this.onJobConvert(job.jobId)}
                       disabled={false}
                     >
                       <Icon name="play" />
