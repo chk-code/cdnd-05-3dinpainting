@@ -28,7 +28,7 @@ export const handler: SNSHandler = async (event: SNSEvent) => {
         }
     }
 }
-// THUMBNAIL AND POSTERIZE
+
 async function processImage(record: S3EventRecord, option: number) {
     const key = record.s3.object.key
     logger.info("Processing S3 item with key: "+key.toString())
@@ -48,25 +48,25 @@ async function processImage(record: S3EventRecord, option: number) {
         // CASE option
         switch(option) { 
             case 1: { 
-                logger.info('Posterize');
+                logger.info("Posterize "+keyname);
                 image.posterize( 5 );  
                 keyname = `${key}-01`
                break; 
             } 
             case 2: { 
-                logger.info('Sepia');
+                logger.info("Sepia "+keyname);
                 image.sepia();
                 keyname = `${key}-02`
                break; 
             } 
             case 3: { 
-                logger.info('Greyscale');
+                logger.info("Greyscale "+keyname);
                 image.greyscale();
                 keyname = `${key}-03`
                 break; 
             }
             case 4: { 
-                logger.info('Inverted');
+                logger.info("Inverted "+keyname);
                 image.invert(); 
                 keyname = `${key}-04`
                 break; 

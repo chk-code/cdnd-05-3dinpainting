@@ -161,13 +161,13 @@ functions:
   NewImgNotifications:
     handler: src/lambda/s3/convertImage.handler
     events:
-    - sns: arn:aws:sns:eu-central-1:335400721406:sls-3dinpainting-app-imgs-dev-SNSTopic
+      - sns: arn:aws:sns:eu-central-1:335400721406:sls-3dinpainting-app-imgs-dev-SNSTopic
     iamRoleStatementsName: NewImgNotifications-${self:provider.stage}
     iamRoleStatements:
       - Effect: Allow
         Action:
           - s3:PutObject
-        Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}/*
+        Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}/*
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
