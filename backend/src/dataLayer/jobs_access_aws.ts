@@ -1,11 +1,11 @@
 import * as AWS  from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
-import { Stream } from 'stream';
+import { Stream } from 'stream'
 import { createLogger } from '../utils/logger'
 
 const strLayer = "DATA-LAYER"
 const logger = createLogger(strLayer)
-const ARCHIVE_CONTENT_TYPE = 'application/zip';
+const ARCHIVE_CONTENT_TYPE = 'application/zip'
 
 const XAWS = AWSXRay.captureAWS(AWS) 
 const s3 = new XAWS.S3({
@@ -332,7 +332,7 @@ export class Jobs_Data_Access{
     async writeStream(bucketName: string, Key: string) {
       logger.info("### "+strLayer+" ### Starting writeStream for "+bucketName+" and key "+Key+" ###")
 
-      const streamPassThrough = new Stream.PassThrough();
+      const streamPassThrough = new Stream.PassThrough()
       logger.info("### "+strLayer+" ### streamPassThrough created ###")
       const params: AWS.S3.PutObjectRequest = {
         ACL: 'private',
@@ -340,18 +340,18 @@ export class Jobs_Data_Access{
         Bucket: bucketName,
         ContentType: ARCHIVE_CONTENT_TYPE,
         Key,
-      };
+      }
       logger.info("### "+strLayer+" ### params created ###")
       logger.info("### "+strLayer+" ### End of writeStream ###")
-      const s3StreamUpload = streamPassThrough
+      //const s3StreamUpload = streamPassThrough
       const uploaded = await s3.upload(params, (error: Error): void => {
         if (error) {
-          logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`);
-          throw error;
+          logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`)
+          throw error
         }
       })
       return [
-        s3StreamUpload,
+        streamPassThrough,
         uploaded 
       ]
     }
