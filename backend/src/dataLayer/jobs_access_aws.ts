@@ -329,15 +329,15 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### End of readStream ###")
       return await s3.getObject({ bucketName, Key }).createReadStream()
     }
-    async writeStream(bucketName: string, Key: string) {
-      logger.info("### "+strLayer+" ### Starting writeStream for "+bucketName+" and key "+Key+" ###")
+    async writeStream(Bucket: string, Key: string) {
+      logger.info("### "+strLayer+" ### Starting writeStream for "+Bucket+" and key "+Key+" ###")
 
       const streamPassThrough = new Stream.PassThrough()
       logger.info("### "+strLayer+" ### streamPassThrough created ###")
       const params: AWS.S3.PutObjectRequest = {
         ACL: 'private',
         Body: streamPassThrough,
-        Bucket: bucketName,
+        Bucket,
         ContentType: ARCHIVE_CONTENT_TYPE,
         Key,
       }
