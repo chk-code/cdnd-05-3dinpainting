@@ -328,10 +328,10 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### Starting readStream ###")
       const params = { Bucket: bucketName, Key: fKey }
       logger.info("### "+strLayer+" ### End of readStream ###")
-      return await s3.getObject(params).createReadStream().promise()
+      return await s3.getObject(params).createReadStream()
     }
-    async writeStream(Key: string) {
-      logger.info("### "+strLayer+" ### Starting writeStream for "+this.s3bckVIDS+" and key "+Key+" ###")
+    async writeStream(fKey: string) {
+      logger.info("### "+strLayer+" ### Starting writeStream for "+this.s3bckVIDS+" and key "+fKey+" ###")
 
       const streamPassThrough = new Stream.PassThrough()
       logger.info("### "+strLayer+" ### streamPassThrough created ###")
@@ -340,7 +340,7 @@ export class Jobs_Data_Access{
         Body: streamPassThrough,
         Bucket: this.s3bckVIDS,
         ContentType: ARCHIVE_CONTENT_TYPE,
-        Key: Key,
+        Key: fKey,
         StorageClass: 'STANDARD_IA', // Or as appropriate
       }
       logger.info("### "+strLayer+" ### params created ###")
@@ -351,7 +351,7 @@ export class Jobs_Data_Access{
           logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`)
           throw error
         }
-      }).promise()
+      })
       return [
         streamPassThrough,
         uploaded 
