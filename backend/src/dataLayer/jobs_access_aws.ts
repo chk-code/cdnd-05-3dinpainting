@@ -327,7 +327,7 @@ export class Jobs_Data_Access{
     async readStream(bucketName: string, Key: string): Promise<any> {
       logger.info("### "+strLayer+" ### Starting readStream ###")
       logger.info("### "+strLayer+" ### End of readStream ###")
-      return s3.getObject({ bucketName, Key }).createReadStream()
+      return await s3.getObject({ bucketName, Key }).createReadStream()
     }
     async writeStream(bucketName: string, Key: string) {
       logger.info("### "+strLayer+" ### Starting writeStream for "+bucketName+" and key "+Key+" ###")
@@ -344,7 +344,7 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### params created ###")
       logger.info("### "+strLayer+" ### End of writeStream ###")
       const s3StreamUpload = streamPassThrough
-      const uploaded = s3.upload(params, (error: Error): void => {
+      const uploaded = await s3.upload(params, (error: Error): void => {
         if (error) {
           logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`);
           throw error;

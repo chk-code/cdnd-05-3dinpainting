@@ -70,8 +70,12 @@ export async function getUploadUrl(
 
 export async function getZipUrl(
   idToken: string,
-  JobId: string
+  JobId: string,
+  zipped: boolean
 ): Promise<string> {
+  const s3bckVIDS = "sls-3dinpainting-app-vids-dev"
+  if(zipped){ return "https://"+s3bckVIDS+".s3.amazonaws.com/archive_"+JobId+".zip"}
+
   const response = await Axios.post(`${apiEndpoint}/jobs/${JobId}/zip`, '', {
     headers: {
       'Content-Type': 'application/json',

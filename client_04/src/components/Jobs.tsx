@@ -32,6 +32,7 @@ interface JobsState {
   newJobName: string
   loadingJobs: boolean
   isDisabled: boolean
+  zipped: boolean
 }
 
 export class Jobs extends React.PureComponent<JobsProps, JobsState> {
@@ -39,7 +40,8 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
     jobs: [],
     newJobName: '',
     loadingJobs: true,
-    isDisabled: true
+    isDisabled: true,
+    zipped: false
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +73,8 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
 
   onJobZip = async (jobId: string) => { 
     try {
-      await getZipUrl(this.props.auth.getIdToken(), jobId)
+      await getZipUrl(this.props.auth.getIdToken(), jobId, this.state.zipped)
+      this.setState({ zipped: true })
     } catch {
       alert('Job zipping failed')
     }
