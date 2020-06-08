@@ -3,6 +3,17 @@ import * as AWSXRay from 'aws-xray-sdk'
 import { Stream } from 'stream'
 import { createLogger } from '../utils/logger'
 
+const https = require('https');
+const sslAgent = new https.Agent({
+  KeepAlive: true,
+  rejectUnauthorized: true
+  })
+sslAgent.setMaxListeners(0)
+AWS.config.update({
+  httpOptions: {
+  agent: sslAgent,
+  }
+  })
 const strLayer = "DATA-LAYER"
 const logger = createLogger(strLayer)
 const ARCHIVE_CONTENT_TYPE = 'application/zip'

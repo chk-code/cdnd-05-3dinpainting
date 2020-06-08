@@ -60,9 +60,9 @@ export class ZipHandler {
       })
 
       logger.info("### "+strLayer+" ### Starting upload of zip File ###")
-      uploaded.on('close', resolve)
-      uploaded.on('end', resolve)
-      uploaded.on('error', reject)
+      uploaded.on('close', resolve())
+      uploaded.on('end', resolve())
+      uploaded.on('error', reject())
 
       archive.pipe(s3StreamUpload)
       s3DownloadStreams.forEach(
@@ -79,9 +79,10 @@ export class ZipHandler {
 }
 
 const zipHandler: Function = async (jobId: string, userId: string, event: Zip) => {
-
-  //console.time("zipProcess for "+jobId)
-  logger.info("### "+strLayer+" ### Started zipHandler function ###",event)
+  const timestamp = new Date().getTime();
+  const timeLabel = jobId+"-"+timestamp
+  console.time(timeLabel)
+  logger.info("### "+strLayer+" ### Started zipHandler function "+timeLabel+" ###",event)
 
   // https://stackoverflow.com/q/56188864/2015025
   // Lambda is standalone service that doesn't need to be integrated with API Gateway. queryStringParameters, body, body mapping templates, all of this is specific not to Lambda, but to Lambda - API Gateway integration.
@@ -97,7 +98,7 @@ const zipHandler: Function = async (jobId: string, userId: string, event: Zip) =
     "zipUrl": retZipUrl
   } */
 
-  //console.timeEnd("zipProcess for "+jobId)
+  console.timeEnd(timeLabel)
   logger.info("### "+strLayer+" ### End of zipHandler function ###")
   return retZipUrl //response
 }
