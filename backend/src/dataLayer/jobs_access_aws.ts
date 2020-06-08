@@ -329,17 +329,18 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### End of readStream ###")
       return await s3.getObject({ bucketName, Key }).createReadStream()
     }
-    async writeStream(Bucket: string, Key: string) {
-      logger.info("### "+strLayer+" ### Starting writeStream for "+Bucket+" and key "+Key+" ###")
+    async writeStream(Key: string) {
+      logger.info("### "+strLayer+" ### Starting writeStream for "+this.s3bckVIDS+" and key "+Key+" ###")
 
       const streamPassThrough = new Stream.PassThrough()
       logger.info("### "+strLayer+" ### streamPassThrough created ###")
       const params: AWS.S3.PutObjectRequest = {
         ACL: 'private',
         Body: streamPassThrough,
-        Bucket,
+        Bucket: this.s3bckVIDS,
         ContentType: ARCHIVE_CONTENT_TYPE,
-        Key,
+        Key: Key,
+        StorageClass: 'STANDARD_IA', // Or as appropriate
       }
       logger.info("### "+strLayer+" ### params created ###")
       logger.info("### "+strLayer+" ### End of writeStream ###")
@@ -355,4 +356,5 @@ export class Jobs_Data_Access{
         uploaded 
       ]
     }
-}DataView
+}
+

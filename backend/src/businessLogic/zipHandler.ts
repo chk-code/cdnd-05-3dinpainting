@@ -47,7 +47,7 @@ export class ZipHandler {
   async process() {
     logger.info("### "+strLayer+" ### Start of zipping process ###")
     //const { s3StreamUpload, uploaded } = jobsDataAccess.writeStream(this.zipFileName, this.archiveFilePath)
-    const retValues = jobsDataAccess.writeStream(this.s3bckVIDS, this.archiveFilePath)
+    const retValues = jobsDataAccess.writeStream(this.archiveFilePath)
     const s3StreamUpload = retValues[0]
     const uploaded = retValues[1]
     const s3DownloadStreams = this.s3DownloadStreams()
