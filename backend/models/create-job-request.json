@@ -32,6 +32,9 @@
       },
       "vidUrl_04": {
         "type":"string"
+      },
+      "zipUrl": {
+        "type":"string"
       }
     },
     "required": [

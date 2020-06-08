@@ -201,7 +201,7 @@ export class Jobs_Data_Access{
      * @param userId an specific ID of an User
      * @returns the updated Job element
     */
-   async updateJobZipURL(jobId: string, userId: string): Promise<JobItem> {
+   async updateJobZipURL(jobId: string, userId: string): Promise<string> {
     logger.info("### "+strLayer+" ### Starting updateJobZipURL ###")
     const zipURL = `https://${this.s3bckVIDS}.s3.amazonaws.com/archive_${jobId}.zip`
     const tblKey = {
@@ -219,7 +219,7 @@ export class Jobs_Data_Access{
         ReturnValues: "UPDATED_NEW"
       }).promise()  
     logger.info("### "+strLayer+" ### End of updateJobZipURL ###")
-    return resUpd.$response.data as JobItem  
+    return zipURL 
 }
     /**
      * Update the vid URLs for the specified Job element
@@ -330,7 +330,7 @@ export class Jobs_Data_Access{
       return s3.getObject({ bucketName, Key }).createReadStream()
     }
     async writeStream(bucketName: string, Key: string) {
-      logger.info("### "+strLayer+" ### Starting writeStream ###")
+      logger.info("### "+strLayer+" ### Starting writeStream for "+bucketName+" and key "+Key+" ###")
 
       const streamPassThrough = new Stream.PassThrough();
       logger.info("### "+strLayer+" ### streamPassThrough created ###")
@@ -343,14 +343,16 @@ export class Jobs_Data_Access{
       };
       logger.info("### "+strLayer+" ### params created ###")
       logger.info("### "+strLayer+" ### End of writeStream ###")
-      return {
-        s3StreamUpload: streamPassThrough,
-        uploaded: s3.upload(params, (error: Error): void => {
-          if (error) {
-            logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`);
-            throw error;
-          }
-        })
-      }
+      const s3StreamUpload = streamPassThrough
+      const uploaded = s3.upload(params, (error: Error): void => {
+        if (error) {
+          logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`);
+          throw error;
+        }
+      })
+      return [
+        s3StreamUpload,
+        uploaded 
+      ]
     }
 }

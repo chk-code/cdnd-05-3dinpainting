@@ -12,4 +12,5 @@ export interface JobItem {
   vidUrl_02?: string
   vidUrl_03?: string
   vidUrl_04?: string
+  zipUrl?: string
 }

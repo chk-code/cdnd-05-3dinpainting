@@ -42,7 +42,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     ]
   const zipJob: Zip = {
       keys: keys,
-      archiveFilePath: "archive_"+jobId,
+      archiveFilePath: "archive_"+jobId+".zip",
       archiveFolderPath: "",
       archiveFormat: "zip"
   }

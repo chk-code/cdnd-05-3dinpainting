@@ -19,7 +19,6 @@ interface Zip {
 
 export class ZipHandler {
   keys: string[];
-  zipFileName: string;
   archiveFilePath: string;
   archiveFolderPath: string;
   archiveFormat: Archiver.Format;
@@ -48,7 +47,7 @@ export class ZipHandler {
   async process() {
     logger.info("### "+strLayer+" ### Start of zipping process ###")
     //const { s3StreamUpload, uploaded } = jobsDataAccess.writeStream(this.zipFileName, this.archiveFilePath);
-    const retValues = jobsDataAccess.writeStream(this.zipFileName, this.archiveFilePath);
+    const retValues = jobsDataAccess.writeStream(this.s3bckVIDS, this.archiveFilePath);
     const s3StreamUpload = retValues[0]
     const uploaded = retValues[1]
     const s3DownloadStreams = this.s3DownloadStreams();
@@ -89,10 +88,10 @@ const zipHandler: Function = async (jobId: string, userId: string, event: Zip) =
 
   const zipHandler = new ZipHandler(keys, archiveFilePath, archiveFolderPath, archiveFormat);
   await zipHandler.process();
-  await jobsDataAccess.updateJobZipURL(jobId,userId)
+  const retZipUrl = await jobsDataAccess.updateJobZipURL(jobId,userId)
 
   const response = {
-    zipUrl: archiveFilePath
+    "zipUrl": retZipUrl
   };
 
   console.timeEnd('zipProcess');
