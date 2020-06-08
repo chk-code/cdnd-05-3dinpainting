@@ -80,7 +80,7 @@ export class ZipHandler {
 
 const zipHandler: Function = async (jobId: string, userId: string, event: Zip) => {
 
-  console.time('zipProcess')
+  //console.time("zipProcess for "+jobId)
   logger.info("### "+strLayer+" ### Started zipHandler function ###",event)
 
   // https://stackoverflow.com/q/56188864/2015025
@@ -97,7 +97,7 @@ const zipHandler: Function = async (jobId: string, userId: string, event: Zip) =
     "zipUrl": retZipUrl
   } */
 
-  console.timeEnd('zipProcess')
+  //console.timeEnd("zipProcess for "+jobId)
   logger.info("### "+strLayer+" ### End of zipHandler function ###")
   return retZipUrl //response
 }

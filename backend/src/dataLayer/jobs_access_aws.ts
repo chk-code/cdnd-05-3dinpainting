@@ -351,9 +351,9 @@ export class Jobs_Data_Access{
           throw error
         }
         logger.info("### "+strLayer+" ### S3 upload created ###",resp)
-      })/* .on('httpUploadProgress', (progress: { loaded: number; total: number; part: number; key: string }) => {
+      }).on('httpUploadProgress', (progress: { loaded: number; total: number; part: number; key: string }) => {
         logger.info("### "+strLayer+" ### S3 Upload progress",progress); // { loaded: 4915, total: 192915, part: 1, key: 'foo.jpg' }
-        }) */
+        })
       logger.info("### "+strLayer+" ### End of writeStream ###")
       return [
         streamPassThrough,
