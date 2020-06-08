@@ -324,13 +324,13 @@ export class Jobs_Data_Access{
     }
 
     // ZIP Functions
-    async readStream(bucketName: string, fKey: string): Promise<any> {
+    readStream(bucketName: string, fKey: string) {
       logger.info("### "+strLayer+" ### Starting readStream ###")
       const params = { Bucket: bucketName, Key: fKey }
       logger.info("### "+strLayer+" ### End of readStream ###")
-      return await s3.getObject(params).createReadStream()
+      return s3.getObject(params).createReadStream()
     }
-    async writeStream(fKey: string) {
+    writeStream(fKey: string) {
       logger.info("### "+strLayer+" ### Starting writeStream for "+this.s3bckVIDS+" and key "+fKey+" ###")
 
       const streamPassThrough = new Stream.PassThrough()
@@ -344,9 +344,9 @@ export class Jobs_Data_Access{
         StorageClass: 'STANDARD_IA', // Or as appropriate
       }
       logger.info("### "+strLayer+" ### params created ###")
-      logger.info("### "+strLayer+" ### End of writeStream ###")
+      
       //const s3StreamUpload = streamPassThrough
-      const uploaded = await s3.upload(params, (error: Error, resp) => {
+      const uploaded = s3.upload(params, (error: Error, resp) => {
         if (error) {
           logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`)
           throw error
@@ -355,6 +355,7 @@ export class Jobs_Data_Access{
       }).on('httpUploadProgress', (progress: { loaded: number; total: number; part: number; key: string }) => {
         logger.info("### "+strLayer+" ### S3 Upload progress",progress); // { loaded: 4915, total: 192915, part: 1, key: 'foo.jpg' }
         })
+      logger.info("### "+strLayer+" ### End of writeStream ###")
       return [
         streamPassThrough,
         uploaded 
