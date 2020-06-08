@@ -1,5 +1,5 @@
 import 'source-map-support/register'
-import Archiver from 'archiver';
+import Archiver from 'archiver'
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
@@ -57,6 +57,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      "zipUrl": updZip.zipUrl})
+      //"zipUrl": updZip.zipUrl})
+      "zipUrl": updZip})
   }
 }

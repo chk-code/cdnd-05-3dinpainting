@@ -233,6 +233,7 @@ functions:
           - s3:PutObjectRequest
           - s3:GetObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}/*
+    timeout: 30 # optional, in seconds, default is 6
 
   ConvertJob:
     handler: src/lambda/http/convertJob.handler

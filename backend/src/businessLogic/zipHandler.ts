@@ -88,15 +88,16 @@ const zipHandler: Function = async (jobId: string, userId: string, event: Zip) =
 
   const zipHandler = new ZipHandler(keys, archiveFilePath, archiveFolderPath, archiveFormat)
   await zipHandler.process()
+  logger.info("### "+strLayer+" ### zipHandler.process finished. Now updating DynamoDB ###",event)
   const retZipUrl = await jobsDataAccess.updateJobZipURL(jobId,userId)
 
-  const response = {
+  /* const response = {
     "zipUrl": retZipUrl
-  }
+  } */
 
   console.timeEnd('zipProcess')
   logger.info("### "+strLayer+" ### End of zipHandler function ###")
-  return response
+  return retZipUrl //response
 }
 
 export default zipHandler
