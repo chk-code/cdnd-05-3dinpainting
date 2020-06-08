@@ -346,16 +346,18 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### params created ###")
       logger.info("### "+strLayer+" ### End of writeStream ###")
       //const s3StreamUpload = streamPassThrough
-      const uploaded = await s3.upload(params, (error: Error): void => {
+      const uploaded = await s3.upload(params, (error: Error, resp) => {
         if (error) {
           logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`)
           throw error
         }
-      })
+        logger.info("### "+strLayer+" ### S3 upload created ###",resp)
+      }).on('httpUploadProgress', (progress) => {
+        logger.info("### "+strLayer+" ### S3 Upload progress",progress); // { loaded: 4915, total: 192915, part: 1, key: 'foo.jpg' }
+        })
       return [
         streamPassThrough,
         uploaded 
       ]
     }
 }
-
