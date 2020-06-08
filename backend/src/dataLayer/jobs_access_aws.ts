@@ -346,7 +346,7 @@ export class Jobs_Data_Access{
       logger.info("### "+strLayer+" ### params created ###")
       
       //const s3StreamUpload = streamPassThrough
-      const uploaded = s3.upload(params, (error: Error, resp) => {
+      const uploaded = s3.upload(params, (error: Error, resp): void => {
         if (error) {
           logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`)
           throw error
