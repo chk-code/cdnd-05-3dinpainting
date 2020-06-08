@@ -324,10 +324,11 @@ export class Jobs_Data_Access{
     }
 
     // ZIP Functions
-    async readStream(bucketName: string, Key: string): Promise<any> {
+    async readStream(bucketName: string, fKey: string): Promise<any> {
       logger.info("### "+strLayer+" ### Starting readStream ###")
+      const params = { Bucket: bucketName, Key: fKey }
       logger.info("### "+strLayer+" ### End of readStream ###")
-      return await s3.getObject({ bucketName, Key }).createReadStream()
+      return await s3.getObject(params).createReadStream().promise()
     }
     async writeStream(Key: string) {
       logger.info("### "+strLayer+" ### Starting writeStream for "+this.s3bckVIDS+" and key "+Key+" ###")
@@ -350,7 +351,7 @@ export class Jobs_Data_Access{
           logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`)
           throw error
         }
-      })
+      }).promise()
       return [
         streamPassThrough,
         uploaded 
