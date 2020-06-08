@@ -5,7 +5,7 @@ import { createLogger } from '../utils/logger'
 import { Jobs_Data_Access } from '../dataLayer/jobs_access_aws'
 
 const jobsDataAccess = new Jobs_Data_Access()
-const strLayer = "ZIP-HANDLER"
+const strLayer = "BL ZIP-HANDLER"
 const logger = createLogger(strLayer)
 
 type S3DownloadStreamDetails = { stream: Readable, filename: string }
@@ -65,15 +65,16 @@ export class ZipHandler {
       uploaded.on('error', reject)
 
       archive.pipe(s3StreamUpload)
-      s3DownloadStreams.forEach((streamDetails: S3DownloadStreamDetails) => archive.append(streamDetails.stream, { name: streamDetails.filename })
+      s3DownloadStreams.forEach(
+        (streamDetails: S3DownloadStreamDetails) => archive.append(streamDetails.stream, { name: streamDetails.filename })
       )
       archive.finalize()
     }).catch((error: { code: string; message: string; data: string }) => {
-      throw new Error(`${error.code} ${error.message} ${error.data}`)
+      throw new Error(`Error in Promise Archive Function: ${error.code} ${error.message} ${error.data}`)
     })
-
-    await uploaded.promise()
     logger.info("### "+strLayer+" ### End upload of zip File ###")
+    await uploaded.promise()
+    logger.info("### "+strLayer+" ### End of zipping process for "+this.archiveFilePath+" ###")
   }
 }
 
