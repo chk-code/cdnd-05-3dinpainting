@@ -218,7 +218,7 @@ export class Jobs_Data_Access{
           },
         ReturnValues: "UPDATED_NEW"
       }).promise()  
-    logger.info("### "+strLayer+" ### End of updateJobZipURL ###")
+    logger.info("### "+strLayer+" ### End of updateJobZipURL ###", resUpd)
     return zipURL 
 }
     /**
