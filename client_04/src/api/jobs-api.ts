@@ -68,6 +68,19 @@ export async function getUploadUrl(
   return response.data.uploadUrl
 }
 
+export async function getZipUrl(
+  idToken: string,
+  JobId: string
+): Promise<string> {
+  const response = await Axios.post(`${apiEndpoint}/jobs/${JobId}/zip`, '', {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    }
+  })
+  return response.data.zipUrl
+}
+
 export async function convertJob(
   idToken: string,
   JobId: string

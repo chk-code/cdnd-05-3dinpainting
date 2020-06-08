@@ -206,6 +206,32 @@ functions:
           - s3:PutObject
           - s3:GetObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_IMGS}/*
+  ZipImgs:
+    handler: src/lambda/http/zipImgs.handler
+    events:
+      - http:
+          method: post
+          path: jobs/{jobId}/zip
+          authorizer: Auth
+          cors: true
+          documentation:
+            summary: Create a zip file for converted images
+            description: Create a zip file for converted images
+    iamRoleStatementsName: ZipImgs-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}/index/${self:provider.environment.IDX_JOBS_JOBID}
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.JOBS_TABLE}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: arn:aws:s3:::${self:provider.environment.S3_VIDS}/*
 
   ConvertJob:
     handler: src/lambda/http/convertJob.handler

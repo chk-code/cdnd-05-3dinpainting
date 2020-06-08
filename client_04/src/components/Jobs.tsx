@@ -5,7 +5,6 @@ import * as React from 'react'
 import Popup from "reactjs-popup";
 import {
   Button,
-
   Divider,
   Grid,
   Header,
@@ -14,10 +13,11 @@ import {
   Image,
   Loader,
   Label,
-  Pagination
+  Pagination,
+  Item
 } from 'semantic-ui-react'
 
-import { createJob, deleteJob, getJobs, convertJob, patchJob } from '../api/jobs-api'
+import { createJob, deleteJob, getJobs, convertJob, patchJob, getZipUrl } from '../api/jobs-api'
 import Auth from '../auth/Auth'
 import { Job } from '../types/Job'
 import * as uuid from 'uuid'
@@ -66,6 +66,14 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
       await convertJob(this.props.auth.getIdToken(), jobId)
     } catch {
       alert('Job conversion failed')
+    }
+  }
+
+  onJobZip = async (jobId: string) => { 
+    try {
+      await getZipUrl(this.props.auth.getIdToken(), jobId)
+    } catch {
+      alert('Job zipping failed')
     }
   }
 
@@ -240,19 +248,26 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
                   <Divider hidden />
               )}
               {job.imgUrl && (
-                  <Image src={job.imgUrl}
-                    size="medium"
-                    verticalAlign="middle" 
+                <Item.Group>
+                <Item>
+                  <Item.Image size='tiny' src={job.imgUrl}
                     as='a'
                     href={job.imgUrl}
                     target='_blank'
                   />
+                  <Item.Content>
+                    <Item.Header as='a'>Original Image</Item.Header>
+                    <Item.Meta>Created at: {job.createdAt}</Item.Meta>
+                  </Item.Content>
+                </Item>
+
+              </Item.Group>
               )}
               {job.imgUrl && (
                   <Divider hidden />
               )}
               {job.vidUrl_01 && (
-                  <Image.Group size='mini' verticalAlign="middle" floated="right">
+                  <Image.Group size='tiny' verticalAlign="middle" floated="right">
                     <Image src={job.vidUrl_01} 
                     as='a'
                     href={job.vidUrl_01}
@@ -321,6 +336,25 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
                       disabled={true}
                     >
                       <Icon name="play" />
+                    </Button>
+                )}
+                {job.jobStatus === "done" && (
+                    <Button
+                      icon
+                      color="green"
+                      onClick={() => this.onJobZip(job.jobId)}
+                      disabled={false}
+                    >
+                      <Icon name="download" />
+                    </Button>
+                )}
+                {job.jobStatus !== "done" && (
+                    <Button
+                      icon
+                      color="grey"
+                      disabled={true}
+                    >
+                      <Icon name="download" />
                     </Button>
                 )}
                   <Button

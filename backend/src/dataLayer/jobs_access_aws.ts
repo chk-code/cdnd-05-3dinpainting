@@ -1,9 +1,11 @@
 import * as AWS  from 'aws-sdk'
 import * as AWSXRay from 'aws-xray-sdk'
+import { Stream } from 'stream';
 import { createLogger } from '../utils/logger'
 
 const strLayer = "DATA-LAYER"
 const logger = createLogger(strLayer)
+const ARCHIVE_CONTENT_TYPE = 'application/zip';
 
 const XAWS = AWSXRay.captureAWS(AWS) 
 const s3 = new XAWS.S3({
@@ -194,6 +196,32 @@ export class Jobs_Data_Access{
         return resUpd.$response.data as JobItem  
     }
     /**
+     * Update the zip URL for the specified Job element
+     * @param jobItem an specific Job Element of type JobItem
+     * @param userId an specific ID of an User
+     * @returns the updated Job element
+    */
+   async updateJobZipURL(jobId: string, userId: string): Promise<JobItem> {
+    logger.info("### "+strLayer+" ### Starting updateJobZipURL ###")
+    const zipURL = `https://${this.s3bckVIDS}.s3.amazonaws.com/archive_${jobId}.zip`
+    const tblKey = {
+      jobId: jobId,
+      userId: userId
+    }
+    logger.info("### "+strLayer+" ### Updating DynamoDB after Zip Request ###")
+    const resUpd = await this.docClient.update({
+        TableName: this.jobsTable,
+        Key: tblKey,
+        UpdateExpression: 'set zipUrl = :zUrl',
+        ExpressionAttributeValues:{
+          ':zUrl' : zipURL,
+          },
+        ReturnValues: "UPDATED_NEW"
+      }).promise()  
+    logger.info("### "+strLayer+" ### End of updateJobZipURL ###")
+    return resUpd.$response.data as JobItem  
+}
+    /**
      * Update the vid URLs for the specified Job element
      * @param jobItem an specific Job Element of type JobItem
      * 
@@ -295,6 +323,34 @@ export class Jobs_Data_Access{
       return true
     }
 
-    // GENERATE Functions
-    // Nothing yet
+    // ZIP Functions
+    async readStream(bucketName: string, Key: string): Promise<any> {
+      logger.info("### "+strLayer+" ### Starting readStream ###")
+      logger.info("### "+strLayer+" ### End of readStream ###")
+      return s3.getObject({ bucketName, Key }).createReadStream()
+    }
+    async writeStream(bucketName: string, Key: string) {
+      logger.info("### "+strLayer+" ### Starting writeStream ###")
+
+      const streamPassThrough = new Stream.PassThrough();
+      logger.info("### "+strLayer+" ### streamPassThrough created ###")
+      const params: AWS.S3.PutObjectRequest = {
+        ACL: 'private',
+        Body: streamPassThrough,
+        Bucket: bucketName,
+        ContentType: ARCHIVE_CONTENT_TYPE,
+        Key,
+      };
+      logger.info("### "+strLayer+" ### params created ###")
+      logger.info("### "+strLayer+" ### End of writeStream ###")
+      return {
+        s3StreamUpload: streamPassThrough,
+        uploaded: s3.upload(params, (error: Error): void => {
+          if (error) {
+            logger.error("### "+strLayer+" ### "+`Got error creating stream to s3 ${error.name} ${error.message} ${error.stack}`);
+            throw error;
+          }
+        })
+      }
+    }
 }
