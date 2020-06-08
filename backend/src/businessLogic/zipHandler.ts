@@ -60,9 +60,9 @@ export class ZipHandler {
       })
 
       logger.info("### "+strLayer+" ### Starting upload of zip File ###")
-      s3StreamUpload.on('close', resolve)
-      s3StreamUpload.on('end', resolve)
-      s3StreamUpload.on('error', reject)
+      uploaded.on('close', resolve)
+      uploaded.on('end', resolve)
+      uploaded.on('error', reject)
 
       archive.pipe(s3StreamUpload)
       s3DownloadStreams.forEach((streamDetails: S3DownloadStreamDetails) => archive.append(streamDetails.stream, { name: streamDetails.filename })
