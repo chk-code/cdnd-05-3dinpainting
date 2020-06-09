@@ -1,42 +1,51 @@
 # CDND 05 - Picture Capstone Project
+> This is the final project of the Cloud Developer Nanodegree @ Udacity. The purpose of the cloud developer capstone project is to combine what I learned throughout the program. In this project, I build a cloud-based application on a serverless architecture. 
 
-This is the final project of the Cloud Developer Nanodegree @ Udacity. The purpose of the cloud developer capstone project is to combine what I learned throughout the program. In this project, I build a cloud-based application on a serverless architecture. 
+# Table of contents
+* [Functionality of the application](#functionality-of-the-application)
+* [How to run the application](#how-to-run-the-application)
+* [Postman collection](#postman-collection)
+
 
 # Functionality of the application
 
-This application allows an user to create image jobs. These image jobs will convert an uploaded picture into 4 modified alternatives automatically (used filters are posterized, sepia, greyscale and inverted). After converting, the user is able to download the pictures by using a zip & download function. Each user can only access his own image jobs. 
+This application allows an user to create image jobs. These image jobs will convert automatically an uploaded picture into 4 modified alternatives (used filters are: posterized, sepia, greyscale and inverted). After converting, the user is able to download the pictures by using a zip & download function. Each user can only access his own image jobs. 
 
 # Key Learnings
 
-## Setup Travis CI/CD for AWS and Serverless
+## Setup Travis CI/CD for AWS and Serverless - (Option 1): CI/CD, Github & Code Quality
 
-Helpful link to setup a nice .travis.yml https://medium.com/swlh/setup-ci-cd-pipeline-for-aws-lambda-using-github-travis-ci-9812c8ef7199
+The project is configured to user CI with GItHub and CD with TravisCI. The code will be served by a serverless.yml for AWS. A pushed code change (either dev or master branch) will be processed by TravisCI, deployment will be donbe automatically.
 
 ## AUTH0
 
-Config for Auth0: CLient Name SLS-3D-Inpainting and Domain: hydronet.eu.auth0.com. ClientID and Secret will be stored in AWS
+The project uses Auth0 as Authorization provider.
+Config for Auth0: Client Name SLS-3D-Inpainting and Domain: hydronet.eu.auth0.com. ClientID and Secret will be stored in AWS
 
+# Implemented Functions - (Option 2): Functionality
 
+The application allows users to create, update, delete image job items. Each item consists of a job name and a picture and various other options (see below)
 
-# The JOB items
+## The JOB items
 
-The application should store TODO items, and each TODO item contains the following fields:
+The application stores Image Job items. Each Job item contains the following fields:
 
-* `todoId` (string) - a unique id for an item
+* `userId` (string) - the unique user id for each job
+* `jobId` (string) - a unique id for a job item
 * `createdAt` (string) - date and time when an item was created
-* `name` (string) - name of a TODO item (e.g. "Change a light bulb")
-* `dueDate` (string) - date and time by which an item should be completed
-* `done` (boolean) - true if an item was completed, false otherwise
-* `attachmentUrl` (string) (optional) - a URL pointing to an image attached to a TODO item
+* `jobName` (string) - name of an image job (e.g. "My first car")
+* `jobStatus` (string) - current status of job processing
+* `todoId` (string) - a unique id for an item
+* `todoId` (string) - a unique id for an item
+* `todoId` (string) - a unique id for an item
+* `imgUrl` (string) (optional) - a URL pointing to an image uploaded to a image job
+* `vidUrl_01` (string) (optional) - a URL pointing to the converted image (Posterized version)
+* `vidUrl_02` (string) (optional) - a URL pointing to the converted image (Sepia version)
+* `vidUrl_03` (string) (optional) - a URL pointing to the converted image (Greyscale version)
+* `vidUrl_04` (string) (optional) - a URL pointing to the converted image (Inverted version)
+* `zipUrl` (string) (optional) - a URL pointing to the zip file (containing all 4 converted images) after conversion
 
-You might also store an id of a user who created a TODO item.
-
-
-# Implemented Functions
-
-
-
-# Frontend
+## Frontend
 
 The `client04` folder contains a web application that can use the API that should be developed in the project.
 
@@ -52,6 +61,7 @@ export const authConfig = {
   callbackUrl: 'http://localhost:3000/callback'
 }
 ```
+## Backendend
 
 # How to run the application
 
