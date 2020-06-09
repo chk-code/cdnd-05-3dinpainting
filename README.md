@@ -83,8 +83,11 @@ export const authConfig = {
 ### Known issues Frontend
 There are some issues related to React Frontned, which are currently open:
 - [ ] Blue Login Button on Login Screen will not forward to Home Screen and Auth0
+** Workaround** User the LogIn Button in the Top Corner Right
 - [ ] Timings: Due to conversion opf images, it needs time. Therefore do not press Convert or zip too fast
+** Workaround** Wait at least a minute after image upload
 - [ ] Refresh of data does not work properly in the React frontend, when Job convert is pressed
+** Workaround** Refresh the page manually after pressing on convert
 
 ## Backend
 The backend code in the `backend` folder is deployed automatically after each push to the dev/master branch via TravisCI. All resources in the application are defined in the "serverless.yml" file. It uses the serverless architecture.
