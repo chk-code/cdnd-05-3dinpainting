@@ -10,6 +10,7 @@
     "dateformat": "^3.0.3",
     "immutability-helper": "^3.0.1",
     "react": "^16.8.6",
+    "aws-sdk": "^2.433.0",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^3.4.1",

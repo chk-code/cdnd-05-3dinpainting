@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Redirect } from 'react-router'
 import Auth from '../auth/Auth'
 import { getUploadUrl, uploadFile } from '../api/jobs-api'
 import {
@@ -6,8 +7,7 @@ import {
   Form,
   Header,
   Icon,
-  Segment,
-  Divider
+  Segment
 } from 'semantic-ui-react'
 enum UploadState {
   NoUpload,
@@ -27,6 +27,7 @@ interface EditJobProps {
 interface EditJobState {
   file: any
   uploadState: UploadState
+  fireRedirect: boolean
 }
 
 export class EditJob extends React.PureComponent<
@@ -35,7 +36,8 @@ export class EditJob extends React.PureComponent<
 > {
   state: EditJobState = {
     file: undefined,
-    uploadState: UploadState.NoUpload
+    uploadState: UploadState.NoUpload,
+    fireRedirect: false
   }
 
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,8 +63,8 @@ export class EditJob extends React.PureComponent<
 
       this.setUploadState(UploadState.UploadingFile)
       await uploadFile(uploadUrl, this.state.file)
-
       alert('File was uploaded!')
+      this.setState({ fireRedirect: true })
     } catch (e) {
       alert('Could not upload a file: ' + e.message)
     } finally {
@@ -77,6 +79,7 @@ export class EditJob extends React.PureComponent<
   }
 
   render() {
+    const { fireRedirect } = this.state
     return (
       <Segment placeholder>
         <Header icon>
@@ -95,6 +98,9 @@ export class EditJob extends React.PureComponent<
           </Form.Field>
           {this.renderButton()}
         </Form>
+        {fireRedirect && (
+          <Redirect to={'/'}/>
+        )}
       </Segment>
       
     )

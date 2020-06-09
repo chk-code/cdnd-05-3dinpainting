@@ -1,5 +1,6 @@
 //import dateFormat from 'dateformat'
 import { History } from 'history'
+import Axios from 'axios'
 //import update from 'immutability-helper'
 import * as React from 'react'
 import Popup from "reactjs-popup";
@@ -17,7 +18,7 @@ import {
   Item
 } from 'semantic-ui-react'
 
-import { createJob, deleteJob, getJobs, convertJob, patchJob, getZipUrl } from '../api/jobs-api'
+import { createJob, deleteJob, getJobs, convertJob, patchJob, getZipUrl, getDownload } from '../api/jobs-api'
 import Auth from '../auth/Auth'
 import { Job } from '../types/Job'
 import * as uuid from 'uuid'
@@ -32,7 +33,7 @@ interface JobsState {
   newJobName: string
   loadingJobs: boolean
   isDisabled: boolean
-  zipped: boolean
+  isConversionDisabled: boolean
 }
 
 export class Jobs extends React.PureComponent<JobsProps, JobsState> {
@@ -41,7 +42,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
     newJobName: '',
     loadingJobs: true,
     isDisabled: true,
-    zipped: false
+    isConversionDisabled: false
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,22 +60,20 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
   }
 
   onJobConvert = async (jobId: string) => { 
+    console.log("onJobConvert fired")
     try {
-      await patchJob(this.props.auth.getIdToken(), jobId, {
-        jobId: jobId,
-        jobStatus: "processing"
-      })
-      //this.setState({loadingJobs: true})
+      this.setState({loadingJobs: true})
       await convertJob(this.props.auth.getIdToken(), jobId)
+      this.setState({loadingJobs: false})
     } catch {
       alert('Job conversion failed')
     }
   }
 
   onJobZip = async (jobId: string) => { 
+    console.log("onJobZip fired")
     try {
-      await getZipUrl(this.props.auth.getIdToken(), jobId, this.state.zipped)
-      this.setState({ zipped: true })
+      await getZipUrl(this.props.auth.getIdToken(), jobId, false)
     } catch {
       alert('Job zipping failed')
     }
@@ -109,22 +108,10 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
     }
   }
 
-  /* onJobCheck = async (pos: number) => {
-    try {
-      const job = this.state.jobs[pos]
-      await patchJob(this.props.auth.getIdToken(), job.jobId, {
-        jobId: job.jobId,
-        jobStatus: job.jobStatus
-      })
-      this.setState({
-        jobs: update(this.state.jobs, {
-          [pos]: { done: { $set: !job.done } }
-        })
-      })
-    } catch {
-      alert('Job deletion failed')
-    }
-  } */
+  downloadImage = async (url: string) => {
+    console.log(url)
+    await getDownload(url)
+  }
 
   async componentDidMount() {
     //if (this.props.location.pathname === '/callback') return;
@@ -149,7 +136,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
     return (
       <div className="header-img">
         <img src={require('../favicons/favicon-32x32.png')} alt="logo" />
-        <Header as="h1">Your image conversion jobs</Header>
+        <Header as="h1">Your image conversion jobs (most recent on top)</Header>
 
         {this.renderCreateJobInput()}
 
@@ -237,7 +224,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
             <Grid.Row key={job.jobId}>
               <Grid.Column width={5} verticalAlign="middle" wrapped>
                 <Header as='h4'>
-                  {job.jobName}
+                  Job {pos+1}: {job.jobName}
                 </Header>
                 <Divider hidden />
                   <Label>
@@ -269,7 +256,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
               {job.imgUrl && (
                   <Divider hidden />
               )}
-              {job.vidUrl_01 && (
+              {job.jobStatus === "done" && (
                   <Image.Group size='tiny' verticalAlign="middle" floated="right">
                     <Image src={job.vidUrl_01} 
                     as='a'
@@ -326,8 +313,12 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
                     <Button
                       icon
                       color="green"
-                      onClick={() => this.onJobConvert(job.jobId)}
-                      disabled={false}
+                      onClick={() => {
+                        this.onJobConvert(job.jobId);
+                        this.onJobZip(job.jobId);
+                        job.jobStatus = "processing"
+                      }}
+                      disabled={this.state.isConversionDisabled}
                     >
                       <Icon name="play" />
                     </Button>
@@ -345,7 +336,7 @@ export class Jobs extends React.PureComponent<JobsProps, JobsState> {
                     <Button
                       icon
                       color="green"
-                      onClick={() => this.onJobZip(job.jobId)}
+                      onClick={() => this.downloadImage(job.zipUrl!)}
                       disabled={false}
                     >
                       <Icon name="download" />
