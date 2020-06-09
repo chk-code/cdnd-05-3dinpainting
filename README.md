@@ -80,6 +80,11 @@ export const authConfig = {
   callbackUrl: 'http://localhost:3000/callback'
 }
 ```
+### Known issues Frontend
+There are some issues related to React Frontned, which are currently open:
+- [ ] Blue Login Button on Login Screen will not forward to Home Screen and Auth0
+- [ ] Timings: Due to conversion opf images, it needs time. Therefore do not press Convert or zip too fast
+- [ ] Refresh of data does not work properly in the React frontend, when Job convert is pressed
 
 ## Backend
 The backend code in the `backend` folder is deployed automatically after each push to the dev/master branch via TravisCI. All resources in the application are defined in the "serverless.yml" file. It uses the serverless architecture.
