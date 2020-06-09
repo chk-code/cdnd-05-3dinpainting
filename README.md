@@ -16,7 +16,7 @@ This application allows an user to create image jobs. These image jobs will conv
 ## Setup Travis CI/CD for AWS and Serverless
 **(Option 1): CI/CD, Github & Code Quality**
 
-The project is configured to user CI with GItHub and CD with TravisCI. The code will be served by a serverless.yml for AWS. A pushed code change (either dev or master branch) will be processed by TravisCI, deployment will be donbe automatically.
+The project is configured to user CI with GItHub and CD with TravisCI. The code will be served by a serverless.yml for AWS. A pushed code change (either dev or master branch) will be processed by TravisCI, deployment will be done automatically.
 
 ## AUTH0
 
@@ -26,14 +26,17 @@ Config for Auth0: Client Name SLS-3D-Inpainting and Domain: hydronet.eu.auth0.co
 # Implemented Functions
 **(Option 2): Functionality**
 
-The application allows users to create, update, delete image job items. Each item consists of a job name and a picture and various other options (see below). 
+The application allows users to create, update, delete image job items. Each item consists of a job name and a picture and various other options (see below). The application allows users to upload an image file.. 
 
-The user needs to sign in with credentials. Each user can only see, edit/create his own image jobs. After deleting a job, all images and zip archives are deleted automatically on S3.
+The user needs to sign in with credentials, Authentication is implemented and does not allow unauthenticated access. Each user can only see, edit/create his own image jobs (The application only displays items for a logged in user). After deleting a job, all images and zip archives are deleted automatically on S3.
+
+The code is split into multiple layers separating business logic from I/O related code. 
+Code of Lambda functions is split into multiple files/classes. The business logic of an application is separated from code for database access, file storage, and code related to AWS Lambda.
 
 Used AWS products, configured by serverless:
 - [x] Amazon X-Ray for tracing
 - [x] nodejs12.x
-- [x] A DynamoDB (table with 3 Global Indexes
+- [x] A DynamoDB (table with 3 Global Indexes and composite key)
 - [x] Two S3 Buckets
 - [x] SNS 
 - [x] 8 function handlers
@@ -80,7 +83,9 @@ export const authConfig = {
 ```
 
 ## Backend
-The backend code in the `backend` folder is deployed automatically after each push to the dev/,aster branch via TravisCI. It uses the serverless architecture.
+The backend code in the `backend` folder is deployed automatically after each push to the dev/master branch via TravisCI. All resources in the application are defined in the "serverless.yml" file. It uses the serverless architecture.
+Each function has its own set of permissions. Application has distributed tracing enabled, it has an decent amount of log statements and it generates application level metrics. HTTP requests are validated, using the serverless-reqvalidator-plugin and by providing request schemas in function definitions.
+Data is stored in a table with a composite key.
 
 # How to run the application
 
