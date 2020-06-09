@@ -90,10 +90,10 @@ The backend is running on AWS with serverless configuration. Please use the prov
 
 ## Frontend
 
-To run a client application, run the following commands:
+To run a client application, clone the repo and cd into repo directory. Then run the following commands:
 
 ```
-cd client
+cd client04
 npm install
 npm run start
 ```
