@@ -18,6 +18,9 @@ This application allows an user to create image jobs. These image jobs will conv
 
 The project is configured to user CI with GItHub and CD with TravisCI. The code will be served by a serverless.yml for AWS. A pushed code change (either dev or master branch) will be processed by TravisCI, deployment will be done automatically.
 
+[![Build Status Master](https://travis-ci.org/chk-code/cdnd-05-3dinpainting.svg?branch=master)](https://travis-ci.org/chk-code/cdnd-05-3dinpainting)
+[![Build Status](https://travis-ci.org/chk-code/cdnd-05-3dinpainting.svg?branch=dev)](https://travis-ci.org/chk-code/cdnd-05-3dinpainting)
+
 ## AUTH0
 
 The project uses Auth0 as Authorization provider.
@@ -53,9 +56,6 @@ The application stores Image Job items. Each Job item contains the following fie
 * `createdAt` (string) - date and time when an item was created
 * `jobName` (string) - name of an image job (e.g. "My first car")
 * `jobStatus` (string) - current status of job processing
-* `todoId` (string) - a unique id for an item
-* `todoId` (string) - a unique id for an item
-* `todoId` (string) - a unique id for an item
 * `imgUrl` (string) (optional) - a URL pointing to an image uploaded to a image job
 * `vidUrl_01` (string) (optional) - a URL pointing to the converted image (Posterized version)
 * `vidUrl_02` (string) (optional) - a URL pointing to the converted image (Sepia version)
