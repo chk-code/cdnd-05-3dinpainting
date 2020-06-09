@@ -18,7 +18,6 @@ This application allows an user to create image jobs. These image jobs will conv
 
 The project is configured to user CI with GItHub and CD with TravisCI. The code will be served by a serverless.yml for AWS. A pushed code change (either dev or master branch) will be processed by TravisCI, deployment will be done automatically.
 
-[![Build Status Master](https://travis-ci.org/chk-code/cdnd-05-3dinpainting.svg?branch=master)](https://travis-ci.org/chk-code/cdnd-05-3dinpainting)
 [![Build Status](https://travis-ci.org/chk-code/cdnd-05-3dinpainting.svg?branch=dev)](https://travis-ci.org/chk-code/cdnd-05-3dinpainting)
 
 ## AUTH0
@@ -108,3 +107,15 @@ This should start a development server with the React application that will inte
 # Postman collection
 
 An alternative way to access the API is a Postman collection that contains sample requests. You can find the Postman collection in this project.
+
+# Screenshots
+## Application - Login Screen
+![LoginScreen](https://github.com/chk-code/cdnd-05-3dinpainting/raw/master/screenshots/LoginScreen.png)
+
+## Application - Home Screen
+![AppScreen](https://github.com/chk-code/cdnd-05-3dinpainting/raw/master/screenshots/AppScreen.png)
+
+## TravisCI - Build Screen
+![BuildScreen](https://github.com/chk-code/cdnd-05-3dinpainting/raw/master/screenshots/TRavisCI%20Builds.png)
+
+
